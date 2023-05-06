@@ -1,4 +1,4 @@
-from requests_demo import get_web_page
+from gather_data import get_web_page
 
 from html.parser import HTMLParser
 
