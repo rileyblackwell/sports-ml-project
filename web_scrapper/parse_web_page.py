@@ -1,6 +1,9 @@
-from gather_data import get_web_page
-
+import requests
 from html.parser import HTMLParser
+
+def get_web_page(url):
+    response = requests.get(url)
+    return response.content.decode('utf-8')
 
 class MyHTMLParser(HTMLParser):
     def __init__(self):
@@ -9,24 +12,19 @@ class MyHTMLParser(HTMLParser):
         self.in_span_tag = False
     
     def handle_starttag(self, tag, attrs):         
-        if tag == 'td' and attrs == [('class', 'Table__TD')]:
+        if tag == 'td':
             self.in_td_tag = True
-        elif tag == 'span' and self.in_td_tag:
-            self.in_span_tag = True
+         
         
     def handle_endtag(self, tag):
-        if tag == 'span':
-            self.in_span_tag = False
+        if tag == 'td':
             self.in_td_tag = False    
 
     def handle_data(self, data):
-        if self.in_span_tag and data != ' ':        
+        if self.in_td_tag:        
             print(f"{data}")
 
 parser = MyHTMLParser()
 
-# html_code = open('sample_data.txt', 'r').read()
-html_code = get_web_page('https://www.espn.com/nfl/team/stats/_/name/dal/dallas-cowboys')
+html_code = get_web_page('https://www.fantasypros.com/nfl/games/dalvin-cook.php')
 parser.feed(html_code)
-
-
