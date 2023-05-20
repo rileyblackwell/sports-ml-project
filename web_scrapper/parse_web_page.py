@@ -15,7 +15,6 @@ class MyHTMLParser(HTMLParser):
         if tag == 'td':
             self.in_td_tag = True
          
-        
     def handle_endtag(self, tag):
         if tag == 'td':
             self.in_td_tag = False    

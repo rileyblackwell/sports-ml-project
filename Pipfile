@@ -2,15 +2,13 @@
 url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
-
 # For linux cpu: pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-# For windows cpu: pip3 install torch torchvision torchaudio
-# pip3 install notebook
+# For windows or mac cpu: pip3 install torch torchvision torchaudio 
+
 [packages]
+requests = "*"
 notebook = "*"
-torch = "2.0.1+cpu"
-torchaudio = "2.0.2+cpu"
-torchvision = "0.15.2+cpu"
+matplotlib = "*"
 
 [dev-packages]
 
