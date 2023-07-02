@@ -35,21 +35,11 @@ if __name__ == '__main__':
     output = open('parse_web_page.out', 'w')
     
     i = 0
-    with open ('players_urls.out', 'r') as f:  
+    with open('players_urls.out', 'r') as f:  
         for player in f:
-            player = player.strip()
-            # if i == 0:
-            #     output.write(f'\n{player}\n\n')
-            # else:
-            #     output.write(f'\n\n{player}')    
+            player = player.strip() 
             parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))
-            i += 1
-            if i == 5:
+            if i == 10:
                 break
-    # season = 2020
-    # while season <= 2021:
-    #     parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/dandre-swift.php?season={season}'))
-    #     season += 1
-     
-    
+            i += 1  
     output.close()
