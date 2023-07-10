@@ -35,11 +35,11 @@ if __name__ == '__main__':
     output = open('parse_web_page.out', 'w')
     
     i = 0
-    with open('players_urls.out', 'r') as f:  
+    with open('test_player_urls.out', 'r') as f:  
         for player in f:
             player = player.strip() 
             parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))
-            if i == 10:
+            if i == 21:
                 break
             i += 1  
     output.close()
