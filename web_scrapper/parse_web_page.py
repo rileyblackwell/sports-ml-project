@@ -11,7 +11,7 @@ class MyHTMLParser(HTMLParser):
         self.in_td_tag = False
         self.in_span_tag = False
         self.start_of_data = False
-    
+         
     def handle_starttag(self, tag, attrs):         
         if tag == 'td':
             self.in_td_tag = True
@@ -21,21 +21,25 @@ class MyHTMLParser(HTMLParser):
             self.in_td_tag = False    
 
     def handle_data(self, data):
-        if self.in_td_tag:
-            try: # data starts recording when a number is encountered
-                int(data)
-                self.start_of_data = True        
-            except ValueError:
-                pass
+        if self.in_td_tag:              
             if self.start_of_data:
-                if data[-1] == '%':
-                    output.write(f"{data}")       
+                if data[:4] == 'Week' or data == 'Totals':                    
                     output.write('\n')
-                else:
-                    output.write(f"{data}, ")    
-
-parser = MyHTMLParser()
-
-output = open('parse_web_page.out', 'w') 
-parser.feed(get_web_page('https://www.fantasypros.com/nfl/stats/wr.php?year=2022&week=3&range=week'))
-output.close()
+                if data == 'Week 1':
+                    output.write('\n')    
+            output.write(f"{data}, ")
+            self.start_of_data = True           
+               
+if __name__ == '__main__':
+    parser = MyHTMLParser()
+    output = open('parse_web_page.out', 'w')
+    
+    i = 0
+    with open('test_player_urls.out', 'r') as f:  
+        for player in f:
+            player = player.strip() 
+            parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))
+            if i == 21:
+                break
+            i += 1  
+    output.close()
