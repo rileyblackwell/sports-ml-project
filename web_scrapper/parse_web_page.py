@@ -39,7 +39,7 @@ if __name__ == '__main__':
         for player in f:
             player = player.strip() 
             parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))
-            if i == 21:
+            if i == 20:
                 break
             i += 1  
     output.close()
