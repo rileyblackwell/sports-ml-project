@@ -47,7 +47,7 @@ if __name__ == '__main__':
     parser = MyHTMLParser()
     output = open('skill_scores.out', 'w')
 
-    with open('test_player_urls.out', 'r') as f:  
+    with open('player_urls.out', 'r') as f:  
         i = 0
         for player in f:           
             player = player.strip() 
@@ -57,7 +57,7 @@ if __name__ == '__main__':
                 season += 1
             parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))
             output.write('\n')               
-            if i == 20:
+            if i == 21:
                 break
             i += 1  
     output.close()
