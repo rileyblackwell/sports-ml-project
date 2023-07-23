@@ -32,10 +32,10 @@ class MyHTMLParser(HTMLParser):
                
 if __name__ == '__main__':
     parser = MyHTMLParser()
-    output = open('parse_web_page.out', 'w')
+    output = open('weekly_data.out', 'w')
     
     i = 0
-    with open('test_player_urls.out', 'r') as f:  
+    with open('valid_player_urls.out', 'r') as f:  
         for player in f:
             player = player.strip() 
             parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))

@@ -47,7 +47,7 @@ if __name__ == '__main__':
     parser = MyHTMLParser()
     output = open('skill_scores.out', 'w')
 
-    with open('test_player_urls.out', 'r') as f:  
+    with open('valid_player_urls.out', 'r') as f:  
         i = 0
         for player in f:           
             player = player.strip() 
