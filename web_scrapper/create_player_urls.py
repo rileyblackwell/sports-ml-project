@@ -71,7 +71,7 @@ if __name__ == '__main__':
     player_url_parser.feed(get_web_page('https://www.fantasypros.com/nfl/stats/rb.php'))
     
     valid_player_url_parser = ValidPlayerURLParser() 
-    output = open('players_urls.out', 'w') 
+    output = open('player_urls.out', 'w') 
     for player in player_url_parser.players:
         valid_player_url_parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/rankings/{player}.php'))
         valid_player_url_parser.start_of_data = 0

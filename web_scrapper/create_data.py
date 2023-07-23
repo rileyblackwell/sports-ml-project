@@ -4,8 +4,12 @@ def create_dst_rankings_dictionary():
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
     dst_rankings = {}
+    week = 0
     for line in data:
-        dst_rankings[line[1][1:]] = line[0]
+        if line[0] == '':
+            week += 1
+        else:
+            dst_rankings[(week, line[1][1:])] = line[0]    
     return dst_rankings
 
 def create_skill_score():
@@ -37,6 +41,7 @@ def create_player_data(dst_rankings, skill_scores):
     player_skill_score = ''  
     player_data = []
     player = 0
+    week = 0
     for line in data:
         if line[0] == '':    
             player_data.append(f'{player_dst[:-2]}\n')
@@ -46,12 +51,14 @@ def create_player_data(dst_rankings, skill_scores):
             player_fantasy_points = ''
             player_skill_score = ''
             player += 1
+            week = 0
         try: 
             dst = line[1][1:]
             dst = dst.replace('@ ', '')
             dst = dst.replace('vs. ', '')
             try:
-                dst = dst_rankings[dst]  
+                dst = dst_rankings[(week, dst)]
+                week += 1  
                 fantasy_points = line[17][1:]
                 skill_score = skill_scores[player]   
                 if fantasy_points != '-':              
