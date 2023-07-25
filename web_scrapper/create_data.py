@@ -26,8 +26,12 @@ def create_skill_score():
             skill_score = 0
             seasons = 0
         else:     
-            skill_score += float(line[1]) / float(line[0])
-            seasons += 1
+            try:
+                skill_score += float(line[1]) / float(line[0])        
+            except ZeroDivisionError:
+                if float(line[0]) != 0 and float(line[1]) != 0: # Error occurs when dividing 0 points scored / 0 games played.
+                    raise ZeroDivisionError
+            seasons += 1      
     return skill_scores        
 
 def create_player_data(dst_rankings, skill_scores):
