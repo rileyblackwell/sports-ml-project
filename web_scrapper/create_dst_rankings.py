@@ -50,5 +50,5 @@ if __name__ == '__main__':
     output.close()
 
     output = open('dst_encodings.out', 'w')
-    parser.feed(get_web_page('https://www.fantasypros.com/nfl/stats/dst.php?year=2022'))  
+    parser.feed(get_web_page('https://www.fantasypros.com/nfl/stats/dst.php?year=2017'))  
     output.close()
