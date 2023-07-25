@@ -12,6 +12,16 @@ def create_dst_rankings_dictionary():
             dst_rankings[(week, line[1][1:])] = line[0]    
     return dst_rankings
 
+def create_dst_encodings_dictionary():
+    with open('dst_encodings.out') as f:
+        data = f.readlines()
+        data = [line.strip() for line in data]
+        data = [line.split(',') for line in data]
+    dst_encodings = {}
+    for line in data:
+        dst_encodings[line[1][1:]] = line[0]
+    return dst_encodings
+
 def create_skill_score():
     with open('skill_scores.out') as f:
         data = f.readlines()
@@ -34,13 +44,14 @@ def create_skill_score():
             seasons += 1      
     return skill_scores        
 
-def create_player_data(dst_rankings, skill_scores):
+def create_player_data(dst_rankings, dst_encodings, skill_scores):
     with open('weekly_data.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
 
-    player_dst = ''
+    player_dst_rankings = ''
+    player_dst_encodings = ''
     player_fantasy_points = '' 
     player_skill_score = ''  
     player_data = []
@@ -48,12 +59,14 @@ def create_player_data(dst_rankings, skill_scores):
     week = 0
     for line in data:
         if line[0] == '':    
-            player_data.append(f'{player_dst[:-2]}\n')
+            player_data.append(f'{player_dst_rankings[:-2]}\n')
+            player_data.append(f'{player_dst_encodings[:-2]}\n')
             player_data.append(f'{player_fantasy_points[:-2]}\n')
             player_data.append(f'{player_skill_score[:-2]}\n')
-            player_dst = ''
+            player_dst_rankings = ''
             player_fantasy_points = ''
             player_skill_score = ''
+            player_dst_encodings = ''
             player += 1
             week = 0
         try: 
@@ -61,12 +74,14 @@ def create_player_data(dst_rankings, skill_scores):
             dst = dst.replace('@ ', '')
             dst = dst.replace('vs. ', '')
             try:
-                dst = dst_rankings[(week, dst)]
+                dst_rank = dst_rankings[(week, dst)]
+                dst_encode = dst_encodings[dst]
                 week += 1  
                 fantasy_points = line[17][1:]
                 skill_score = skill_scores[player]   
                 if fantasy_points != '-':              
-                    player_dst += dst + ', '
+                    player_dst_rankings += dst_rank + ', '
+                    player_dst_encodings += dst_encode + ', '
                     player_fantasy_points += fantasy_points + ', '
                     player_skill_score += skill_score + ', '                          
             except KeyError:
@@ -88,6 +103,7 @@ def create_data_txt(player_data):
     output.close()
 
 if __name__ == '__main__':   
-    player_data = create_player_data(create_dst_rankings_dictionary(), create_skill_score())
+    player_data = create_player_data(create_dst_rankings_dictionary(), create_dst_encodings_dictionary(),
+                                     create_skill_score())
     create_data_txt(player_data)
       

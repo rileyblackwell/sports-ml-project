@@ -42,10 +42,13 @@ class DstRankingParser(HTMLParser):
 if __name__ == '__main__':
     parser = DstRankingParser()
     output = open('dst_rankings.out', 'w')
-    parser.feed(get_web_page('https://www.fantasypros.com/nfl/stats/dst.php?year=2021&range=full'))
+    parser.feed(get_web_page('https://www.fantasypros.com/nfl/stats/dst.php?year=2021'))
     output.write('\n')
     for week in range(1, 18):
         parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/stats/dst.php?year=2022&range=custom&start_week=1&end_week={week}'))
         output.write('\n')
-    output.close()  
-    
+    output.close()
+
+    output = open('dst_encodings.out', 'w')
+    parser.feed(get_web_page('https://www.fantasypros.com/nfl/stats/dst.php?year=2022'))  
+    output.close()
