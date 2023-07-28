@@ -26,7 +26,10 @@ class MyHTMLParser(HTMLParser):
                 if data[:4] == 'Week' or data == 'Totals':                    
                     output.write('\n')
                 if data == 'Week 1':
-                    output.write('\n')    
+                    output.write('\n')
+                if data[:34] == 'Player does not have any game data': 
+                    output.write('\n\n')
+                           
             output.write(f"{data}, ")
             self.start_of_data = True           
                
@@ -35,11 +38,13 @@ if __name__ == '__main__':
     output = open('weekly_data.out', 'w')
     
     i = 0
-    with open('player_urls.out', 'r') as f:  
+    with open('player_urls.out', 'r') as f: 
         for player in f:
             player = player.strip() 
-            parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))
-            if i == 85:
+            for season in range(2020, 2022):                   
+                parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php?season={season}'))
+            parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))               
+            if i == 20:
                 break
             i += 1  
     output.close()
