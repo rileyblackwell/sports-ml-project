@@ -73,6 +73,7 @@ if __name__ == '__main__':
     valid_player_url_parser = ValidPlayerURLParser() 
     output = open('player_urls.out', 'w') 
     for player in player_url_parser.players:
-        valid_player_url_parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/rankings/{player}.php'))
-        valid_player_url_parser.start_of_data = 0
+        if player != 'cordarrelle-patterson': # this player has errors in the html
+            valid_player_url_parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/rankings/{player}.php'))
+            valid_player_url_parser.start_of_data = 0
     output.close()
