@@ -44,7 +44,7 @@ if __name__ == '__main__':
             for season in range(2020, 2022):                   
                 parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php?season={season}'))
             parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))               
-            if i == 10:
+            if i == 50:
                 break
             i += 1  
     output.close()

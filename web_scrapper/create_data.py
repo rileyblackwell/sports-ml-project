@@ -55,6 +55,7 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores):
         data = [line.split(',') for line in data]
 
     player_dst_rankings, player_dst_encodings, player_fantasy_points, player_skill_score  = '', '', '', ''
+    player_weeks_encodings, player_season_encodings = '', ''
     player_data = []
     player = 0
     week = 0
@@ -68,7 +69,10 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores):
             player_data.append(f'{player_dst_encodings[:-2]}\n')
             player_data.append(f'{player_fantasy_points[:-2]}\n')
             player_data.append(f'{player_skill_score[:-2]}\n')
+            player_data.append(f'{player_weeks_encodings[:-2]}\n')
+            player_data.append(f'{player_season_encodings[:-2]}\n')
             player_dst_rankings, player_dst_encodings, player_fantasy_points, player_skill_score  = '', '', '', ''
+            player_weeks_encodings, player_season_encodings = '', ''
             player += 1
             year = 0
         
@@ -79,9 +83,11 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores):
             player_dst_rankings +=  '0, ' * num_games 
             player_dst_encodings += '0, ' * num_games
             player_fantasy_points += '0, ' * num_games
+            player_weeks_encodings += '0, ' * num_games
+            player_season_encodings += '0, ' * num_games
             skill_score = skill_scores[player]
             player_skill_score += f'{skill_score}, ' * num_games        
-        else:       
+        else:               
             try: 
                 dst = line[1][1:]
                 dst = dst.replace('@ ', '')
@@ -89,7 +95,9 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores):
                 try:
                     dst_rank = dst_rankings[(year, week, dst)]
                     dst_encode = dst_encodings[dst]
-                    week += 1  
+                    week += 1
+                    player_weeks_encodings += f'{week}, '
+                    player_season_encodings += f'{year}, '   
                     fantasy_points = line[17][1:]
                     skill_score = skill_scores[player]   
                     if fantasy_points != '-':              
@@ -103,7 +111,14 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores):
                         player_fantasy_points += '0, '
                         player_skill_score += skill_score + ', '                              
                 except KeyError:
-                    pass             
+                    # if dst == ' ':
+                    #     player_weeks_encodings += f'{week}, '
+                    #     player_season_encodings += f'{year}, '
+                    #     player_dst_rankings += '0, '
+                    #     player_dst_encodings += '0, '
+                    #     player_fantasy_points += '0, '
+                    #     player_skill_score += skill_score + ', '
+                    pass              
             except IndexError:
                 pass
     return player_data
