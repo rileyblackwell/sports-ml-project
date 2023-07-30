@@ -57,9 +57,7 @@ if __name__ == '__main__':
                 season += 1
             parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))
             output.write('\n')               
-            if i == 85:
+            if i == 50:
                 break
             i += 1  
     output.close()
-
-
