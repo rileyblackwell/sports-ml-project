@@ -251,7 +251,7 @@ if __name__ == '__main__':
             except ZeroDivisionError:
                 error_output.write(player + '\n')
            
-            if i == 9:
+            if i == 0:
                 break
             i += 1
                 
