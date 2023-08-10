@@ -5,7 +5,7 @@ def get_web_page(url):
     response = requests.get(url)
     return response.content.decode('utf-8')
 
-class MyHTMLParser(HTMLParser):
+class WeeklyDataParser(HTMLParser):
     def __init__(self):
         super().__init__()     
         self.in_td_tag = False
@@ -34,17 +34,18 @@ class MyHTMLParser(HTMLParser):
             self.start_of_data = True           
                
 if __name__ == '__main__':
-    parser = MyHTMLParser()
-    output = open('weekly_data.out', 'w')
+    parser = WeeklyDataParser()
     
-    i = 0
+    output = open('weekly_data.out', 'w')
+    # i = 0
     with open('player_urls.out', 'r') as f: 
         for player in f:
             player = player.strip() 
             for season in range(2020, 2022):                   
                 parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php?season={season}'))
             parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))               
-            if i == 50:
-                break
-            i += 1  
+            # if i == 50:
+            #     break
+            # i += 1
+    output.write('\n\n') # prevents a bug in create_data.py where player data isn't outputted.          
     output.close()

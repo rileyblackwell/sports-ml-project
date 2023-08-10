@@ -111,13 +111,6 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores):
                         player_fantasy_points += '0, '
                         player_skill_score += skill_score + ', '                              
                 except KeyError:
-                    # if dst == ' ':
-                    #     player_weeks_encodings += f'{week}, '
-                    #     player_season_encodings += f'{year}, '
-                    #     player_dst_rankings += '0, '
-                    #     player_dst_encodings += '0, '
-                    #     player_fantasy_points += '0, '
-                    #     player_skill_score += skill_score + ', '
                     pass              
             except IndexError:
                 pass

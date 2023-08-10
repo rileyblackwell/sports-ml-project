@@ -5,7 +5,7 @@ def get_web_page(url):
     response = requests.get(url)
     return response.content.decode('utf-8')
 
-class MyHTMLParser(HTMLParser):
+class SKillScoreParser(HTMLParser):
     def __init__(self):
         super().__init__()     
         self.in_td_tag = False
@@ -44,11 +44,11 @@ class MyHTMLParser(HTMLParser):
             self.start_of_data = True           
                
 if __name__ == '__main__':
-    parser = MyHTMLParser()
+    parser = SKillScoreParser()
     output = open('skill_scores.out', 'w')
 
     with open('player_urls.out', 'r') as f:  
-        i = 0
+        # i = 0
         for player in f:           
             player = player.strip() 
             season = 2018
@@ -57,7 +57,7 @@ if __name__ == '__main__':
                 season += 1
             parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))
             output.write('\n')               
-            if i == 50:
-                break
-            i += 1  
+            # if i == 50:
+            #     break
+            # i += 1  
     output.close()
