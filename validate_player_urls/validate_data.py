@@ -229,28 +229,29 @@ if __name__ == '__main__':
             skill_scores_output.write('\n')                
           
             skill_scores_output.close()
-            player_data = create_player_data(create_dst_rankings_dictionary(), create_dst_encodings_dictionary(),
+            try:
+                player_data = create_player_data(create_dst_rankings_dictionary(), create_dst_encodings_dictionary(),
                                      create_skill_score())
-            create_data_txt(player_data)
-            
-           
-            with open('data.txt', 'r') as f:
-                data = f.read()
-                data = data.split('\n')
-             
-                if len(data) == 7:
-                    valid_lines = 0
-                    for line in data:
-                        line = line.split()
-                        if len(line) == 50:
-                            valid_lines += 1
-                    if valid_lines == 6:
-                        valid_output.write(player + '\n')
-                    else:
-                        error_output.write(player + '\n')
+                create_data_txt(player_data)
+                
+                with open('data.txt', 'r') as f:
+                    data = f.read()
+                    data = data.split('\n')
 
-            
-            if i == 4:
+                    if len(data) == 7:
+                        valid_lines = 0
+                        for line in data:
+                            line = line.split()
+                            if len(line) == 50:
+                                valid_lines += 1
+                        if valid_lines == 6:
+                            valid_output.write(player + '\n')
+                        else:
+                            error_output.write(player + '\n')
+            except ZeroDivisionError:
+                error_output.write(player + '\n')
+           
+            if i == 9:
                 break
             i += 1
                 
