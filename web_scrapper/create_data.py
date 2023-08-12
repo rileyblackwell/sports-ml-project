@@ -48,14 +48,35 @@ def create_skill_score():
             seasons += 1      
     return skill_scores        
 
-def create_player_data(dst_rankings, dst_encodings, skill_scores):
+def create_seasons_played():
+    def create_rookie_season():
+        with open('rookie_seasons_data.out') as f:
+            data = f.readlines()
+            data = [line.strip() for line in data]
+            data = [line.split(',') for line in data]
+        rookie_seasons = []
+        for line in data:
+            rookie_seasons.append(line[0][2:])
+        return rookie_seasons
+    
+    rookie_seasons = create_rookie_season()
+    seasons_played = []
+    for rookie_season in rookie_seasons:
+        seasons = []
+        for i in range(2, -1, -1):
+            current_season = max(23 - int(rookie_season) - i, 0) 
+            seasons.append(str(current_season))
+        seasons_played.append(seasons)    
+    return seasons_played
+
+def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played):
     with open('weekly_data.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
 
     player_dst_rankings, player_dst_encodings, player_fantasy_points, player_skill_score  = '', '', '', ''
-    player_weeks_encodings, player_season_encodings = '', ''
+    player_weeks_encodings, player_season_encodings, player_seasons_played = '', '', ''
     player_data = []
     player = 0
     week = 0
@@ -71,8 +92,9 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores):
             player_data.append(f'{player_skill_score[:-2]}\n')
             player_data.append(f'{player_weeks_encodings[:-2]}\n')
             player_data.append(f'{player_season_encodings[:-2]}\n')
+            player_data.append(f'{player_seasons_played[:-2]}\n')
             player_dst_rankings, player_dst_encodings, player_fantasy_points, player_skill_score  = '', '', '', ''
-            player_weeks_encodings, player_season_encodings = '', ''
+            player_weeks_encodings, player_season_encodings, player_seasons_played = '', '', ''
             player += 1
             season = 1
         
@@ -85,7 +107,8 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores):
             player_fantasy_points += '0, ' * num_games
             player_weeks_encodings += '0, ' * num_games
             player_season_encodings += '0, ' * num_games
-            player_skill_score += '0, ' * num_games       
+            player_skill_score += '0, ' * num_games
+            player_seasons_played += '0, ' * num_games       
         else:               
             try: 
                 dst = line[1][1:]
@@ -98,17 +121,16 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores):
                     player_weeks_encodings += f'{week}, '
                     player_season_encodings += f'{season}, '   
                     fantasy_points = line[17][1:]
-                    skill_score = skill_scores[player]   
+                    player_skill_score += skill_scores[player] + ', '
+                    player_seasons_played += seasons_played[player][season - 1] + ', '   
                     if fantasy_points != '-':              
                         player_dst_rankings += dst_rank + ', '
                         player_dst_encodings += dst_encode + ', '
-                        player_fantasy_points += fantasy_points + ', '
-                        player_skill_score += skill_score + ', '
+                        player_fantasy_points += fantasy_points + ', '                      
                     else:
                         player_dst_rankings += '0, '
                         player_dst_encodings += '0, '
-                        player_fantasy_points += '0, '
-                        player_skill_score += skill_score + ', '                              
+                        player_fantasy_points += '0, '                              
                 except KeyError:
                     pass              
             except IndexError:
@@ -126,6 +148,6 @@ def create_data_txt(player_data):
 
 if __name__ == '__main__':   
     player_data = create_player_data(create_dst_rankings_dictionary(), create_dst_encodings_dictionary(),
-                                     create_skill_score())
+                                     create_skill_score(), create_seasons_played())
     create_data_txt(player_data)
       
