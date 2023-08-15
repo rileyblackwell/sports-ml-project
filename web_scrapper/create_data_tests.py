@@ -4,12 +4,13 @@ from create_data import create_skill_score, create_data_txt, create_seasons_play
 
 
 class TestCreateData(unittest.TestCase):
-    # def test_create_player_data(self):
-    #     dst_rankings = create_dst_rankings_dictionary()
-    #     dst_encodings = create_dst_encodings_dictionary()
-    #     skill_scores = create_skill_score()
-    #     player_data = create_player_data(dst_rankings, dst_encodings, skill_scores)
-    #     create_data_txt(player_data)
+    def test_create_player_data(self):
+        dst_rankings = create_dst_rankings_dictionary()
+        dst_encodings = create_dst_encodings_dictionary()
+        skill_scores = create_skill_score()
+        seasons_played = create_seasons_played()
+        player_data = create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played)
+        create_data_txt(player_data)
 
     def test_create_seasons_played(self):
         seasons_played = create_seasons_played()
