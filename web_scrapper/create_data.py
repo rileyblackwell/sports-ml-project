@@ -116,20 +116,20 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played
                 try:
                     dst_rank = dst_rankings[(season, week, dst)]
                     dst_encode = dst_encodings[dst]        
-                    params[4] += f'{week}, '
-                    params[5] += f'{season}, '   
+                    params[2] += f'{week}, '
+                    params[1] += f'{season}, '   
                     fantasy_points = line[17][1:]
-                    params[3] += skill_scores[player] + ', '
+                    params[5] += skill_scores[player] + ', '
                     params[6] += seasons_played[player][season - 1] + ', '
                     week += 1   
                     if fantasy_points == '-':              
                         params[0] += '0, '
-                        params[1] += '0, '
-                        params[2] += '0, '                                           
+                        params[3] += '0, '
+                        params[4] += '0, '                                           
                     else:
-                        params[0] += dst_rank + ', '
-                        params[1] += dst_encode + ', '
-                        params[2] += fantasy_points + ', '                                
+                        params[0] += fantasy_points + ', ' 
+                        params[3] += dst_rank + ', '
+                        params[4] += dst_encode + ', '                                                   
                 except KeyError:
                     pass              
             except IndexError:

@@ -2,8 +2,7 @@ import requests
 from html.parser import HTMLParser
 
 def get_web_page(url):
-    response = requests.get(url)
-    return response.content.decode('utf-8')
+    return requests.get(url).content.decode('utf-8')
 
 class WeeklyDataParser(HTMLParser):
     def __init__(self):
@@ -35,8 +34,8 @@ class WeeklyDataParser(HTMLParser):
                
 if __name__ == '__main__':
     parser = WeeklyDataParser()    
-    with open('weekly_data.out', 'w') as output:
-        with open('../player_urls/player_urls.out', 'r') as f: 
+    with open('testing_weekly_data.out', 'w') as output:
+        with open('../player_urls/testing_player_urls.out', 'r') as f: 
             for player in f:
                 player = player.strip() 
                 for season in range(2020, 2022):                   

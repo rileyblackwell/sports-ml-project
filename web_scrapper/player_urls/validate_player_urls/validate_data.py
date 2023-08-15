@@ -129,8 +129,7 @@ def create_data_txt(player_data):
     output.close() 
   
 def get_web_page(url):
-    response = requests.get(url)
-    return response.content.decode('utf-8')
+    return requests.get(url).content.decode('utf-8')
 
 class WeeklyDataParser(HTMLParser):
     def __init__(self):
@@ -159,10 +158,6 @@ class WeeklyDataParser(HTMLParser):
                            
             weekly_data_output.write(f"{data}, ")
             self.start_of_data = True           
-
-def get_web_page(url):
-    response = requests.get(url)
-    return response.content.decode('utf-8')
 
 class SKillScoreParser(HTMLParser):
     def __init__(self):

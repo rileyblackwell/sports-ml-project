@@ -2,8 +2,7 @@ import requests
 from html.parser import HTMLParser
 
 def get_web_page(url):
-    response = requests.get(url)
-    return response.content.decode('utf-8')
+    return requests.get(url).content.decode('utf-8')
 
 class WeeklyDataParser(HTMLParser):
     def __init__(self):
