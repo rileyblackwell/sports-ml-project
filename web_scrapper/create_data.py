@@ -1,23 +1,22 @@
 def create_dst_rankings_dictionary():
-    with open('dst_rankings.out') as f:
+    with open('dst_rankings_and_encodings/dst_rankings.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
     dst_rankings = {}
-    week = 0
-    season = 1
+    week, season = 1, 1
     for line in data:
         if line[0] == '':
             week += 1
         elif line[0] == 'end of season':
             season += 1
-            week = 0    
+            week = 1    
         else:
             dst_rankings[(season, week, line[1][1:])] = line[0]           
     return dst_rankings
 
 def create_dst_encodings_dictionary():
-    with open('dst_encodings.out') as f:
+    with open('dst_rankings_and_encodings/dst_encodings.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
@@ -26,19 +25,17 @@ def create_dst_encodings_dictionary():
         dst_encodings[line[1][1:]] = line[0]
     return dst_encodings
 
-def create_skill_score():
-    with open('skill_scores.out') as f:
+def create_skill_score(filename = 'skill_scores/skill_scores.out'):
+    with open(filename) as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
     skill_scores = []
-    skill_score = 0
-    seasons = 0
+    skill_score, seasons = 0, 0
     for line in data:
         if line[0] == '':
             skill_scores.append(str(round(skill_score / seasons, 2)))
-            skill_score = 0
-            seasons = 0
+            skill_score, seasons = 0, 0
         else:     
             try:
                 skill_score += float(line[1]) / float(line[0])        
@@ -48,84 +45,107 @@ def create_skill_score():
             seasons += 1      
     return skill_scores        
 
-def create_player_data(dst_rankings, dst_encodings, skill_scores):
-    with open('weekly_data.out') as f:
+def create_seasons_played(filename = 'rookie_seasons/rookie_seasons_data.out'):
+    def create_rookie_season():
+        with open(filename) as f:
+            data = f.readlines()
+            data = [line.strip() for line in data]
+            data = [line.split(',') for line in data]
+        rookie_seasons = []
+        for line in data:
+            rookie_seasons.append(line[0][2:])
+        return rookie_seasons
+    
+    rookie_seasons = create_rookie_season()
+    seasons_played = []
+    for rookie_season in rookie_seasons:
+        seasons = []
+        for i in range(2, -1, -1):
+            current_season = max(23 - int(rookie_season) - i, 0) 
+            seasons.append(str(current_season))
+        seasons_played.append(seasons)    
+    return seasons_played
+
+def initialize_params(num_params):
+    params = []
+    for _ in range(num_params):
+        params.append('')
+    return params
+
+def add_player_data(player_data, params):
+    for param in params:
+        player_data.append(f'{param[:-2]}\n')
+    return player_data
+
+def player_missed_season(params, num_games):
+    new_params = []
+    for param in params:
+        param += '0, ' * num_games
+        new_params.append(param)
+    return new_params
+
+def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played, num_params, 
+                       filename = 'weekly_data/weekly_data.out'):
+    with open(filename) as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
-
-    player_dst_rankings, player_dst_encodings, player_fantasy_points, player_skill_score  = '', '', '', ''
-    player_weeks_encodings, player_season_encodings = '', ''
+    
+    params = initialize_params(num_params)
     player_data = []
-    player = 0
-    week = 0
-    season = 1
+    player, week, season = 0, 1, 1
     for line in data:  
         if line[0] == '':             
-            week = 0
-            season += 1
+            week = 1
+            season += 1       
+        
         if season == 4:
-            player_data.append(f'{player_dst_rankings[:-2]}\n')
-            player_data.append(f'{player_dst_encodings[:-2]}\n')
-            player_data.append(f'{player_fantasy_points[:-2]}\n')
-            player_data.append(f'{player_skill_score[:-2]}\n')
-            player_data.append(f'{player_weeks_encodings[:-2]}\n')
-            player_data.append(f'{player_season_encodings[:-2]}\n')
-            player_dst_rankings, player_dst_encodings, player_fantasy_points, player_skill_score  = '', '', '', ''
-            player_weeks_encodings, player_season_encodings = '', ''
+            player_data = add_player_data(player_data, params)
+            params = initialize_params(num_params)
             player += 1
-            season = 1
+            season = 1       
         
         if line[0][:34] == 'Player does not have any game data':         
             num_games = 16
             if season >= 2: # NFL changed schedule to 17 games in 2021
                 num_games = 17                      
-            player_dst_rankings +=  '0, ' * num_games 
-            player_dst_encodings += '0, ' * num_games
-            player_fantasy_points += '0, ' * num_games
-            player_weeks_encodings += '0, ' * num_games
-            player_season_encodings += '0, ' * num_games
-            player_skill_score += '0, ' * num_games       
+            params = player_missed_season(params, num_games)     
         else:               
             try: 
-                dst = line[1][1:]
-                dst = dst.replace('@ ', '')
-                dst = dst.replace('vs. ', '')
+                dst = line[1][1:].replace('@ ', '').replace('vs. ', '') # Remove @ and vs. from dst name
                 try:
                     dst_rank = dst_rankings[(season, week, dst)]
-                    dst_encode = dst_encodings[dst]
-                    week += 1
-                    player_weeks_encodings += f'{week}, '
-                    player_season_encodings += f'{season}, '   
+                    dst_encode = dst_encodings[dst]        
+                    params[4] += f'{week}, '
+                    params[5] += f'{season}, '   
                     fantasy_points = line[17][1:]
-                    skill_score = skill_scores[player]   
-                    if fantasy_points != '-':              
-                        player_dst_rankings += dst_rank + ', '
-                        player_dst_encodings += dst_encode + ', '
-                        player_fantasy_points += fantasy_points + ', '
-                        player_skill_score += skill_score + ', '
+                    params[3] += skill_scores[player] + ', '
+                    params[6] += seasons_played[player][season - 1] + ', '
+                    week += 1   
+                    if fantasy_points == '-':              
+                        params[0] += '0, '
+                        params[1] += '0, '
+                        params[2] += '0, '                                           
                     else:
-                        player_dst_rankings += '0, '
-                        player_dst_encodings += '0, '
-                        player_fantasy_points += '0, '
-                        player_skill_score += skill_score + ', '                              
+                        params[0] += dst_rank + ', '
+                        params[1] += dst_encode + ', '
+                        params[2] += fantasy_points + ', '                                
                 except KeyError:
                     pass              
             except IndexError:
                 pass
     return player_data
 
-def create_data_txt(player_data):
-    output = open('data.txt', 'w')
-    player_data = [line.split() for line in player_data]     
-    for line in player_data:
-        for item in line:
-            output.write(item + ' ')
-        output.write('\n')
-    output.close()
-
+def create_data_txt(player_data, filename = 'data.txt'):
+    with open(filename, 'w') as output:
+        player_data = [line.split() for line in player_data]     
+        for line in player_data:
+            for item in line:
+                output.write(item + ' ')
+            output.write('\n')
+    
 if __name__ == '__main__':   
     player_data = create_player_data(create_dst_rankings_dictionary(), create_dst_encodings_dictionary(),
-                                     create_skill_score())
+                                     create_skill_score(), create_seasons_played(), 7)
     create_data_txt(player_data)
       

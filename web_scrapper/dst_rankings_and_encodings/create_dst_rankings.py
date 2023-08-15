@@ -41,16 +41,18 @@ class DstRankingParser(HTMLParser):
 
 if __name__ == '__main__':
     parser = DstRankingParser()
-    output = open('dst_rankings.out', 'w')
-    for season in range(2020, 2023):
-        parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/stats/dst.php?year={season - 1}'))
-        output.write('\n')
-        for week in range(1, 18):
-            parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/stats/dst.php?year={season}&range=custom&start_week=1&end_week={week}'))
+    
+    # create dst rankings
+    with open('dst_rankings.out', 'w') as output:
+        for season in range(2020, 2023):
+            parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/stats/dst.php?year={season - 1}'))
             output.write('\n')
-        output.write('end of season\n')    
-    output.close()
-
-    output = open('dst_encodings.out', 'w')
-    parser.feed(get_web_page('https://www.fantasypros.com/nfl/stats/dst.php?year=2017'))  
-    output.close()
+            for week in range(1, 18):
+                parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/stats/dst.php?year={season}&range=custom&start_week=1&end_week={week}'))
+                output.write('\n')
+            output.write('end of season\n')    
+  
+    # create dst encodings
+    with open('dst_encodings.out', 'w') as output:
+        parser.feed(get_web_page('https://www.fantasypros.com/nfl/stats/dst.php?year=2017'))  
+  

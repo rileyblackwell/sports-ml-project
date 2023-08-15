@@ -71,9 +71,9 @@ if __name__ == '__main__':
     player_url_parser.feed(get_web_page('https://www.fantasypros.com/nfl/stats/rb.php'))
     
     valid_player_url_parser = ValidPlayerURLParser() 
-    output = open('player_urls.out', 'w') 
-    for player in player_url_parser.players:
-        if player != 'cordarrelle-patterson' and player != 'latavius-murray': # this player has errors in the html
-            valid_player_url_parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/rankings/{player}.php'))
-            valid_player_url_parser.start_of_data = 0
-    output.close()
+    with open('player_urls.out', 'w') as output: 
+        for player in player_url_parser.players:
+            if player != 'cordarrelle-patterson' and player != 'latavius-murray': # this player has errors in the html
+                valid_player_url_parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/rankings/{player}.php'))
+                valid_player_url_parser.start_of_data = 0
+ 
