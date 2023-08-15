@@ -34,18 +34,13 @@ class WeeklyDataParser(HTMLParser):
             self.start_of_data = True           
                
 if __name__ == '__main__':
-    parser = WeeklyDataParser()
-    
-    output = open('weekly_data.out', 'w')
-    # i = 0
-    with open('player_urls.out', 'r') as f: 
-        for player in f:
-            player = player.strip() 
-            for season in range(2020, 2022):                   
-                parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php?season={season}'))
-            parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))               
-            # if i == 50:
-            #     break
-            # i += 1
-    output.write('\n\n') # prevents a bug in create_data.py where player data isn't outputted.          
-    output.close()
+    parser = WeeklyDataParser()    
+    with open('weekly_data.out', 'w') as output:
+        with open('../player_urls/player_urls.out', 'r') as f: 
+            for player in f:
+                player = player.strip() 
+                for season in range(2020, 2022):                   
+                    parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php?season={season}'))
+                parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))               
+        output.write('\n\n') # prevents a bug in create_data.py where player data isn't outputted.          
+  

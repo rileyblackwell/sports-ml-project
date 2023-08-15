@@ -26,16 +26,11 @@ class WeeklyDataParser(HTMLParser):
                 self.first_td = False
                     
 if __name__ == '__main__':
-    output = open('rookie_seasons_data.out', 'w')
     parser = WeeklyDataParser()
- 
-    # i = 0
-    with open('player_urls.out', 'r') as f: 
-        for player in f:
-            player = player.strip() 
-            parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/stats/{player}.php'))             
-            parser.first_td = True
-            # if i == 4:
-            #     break
-            # i += 1          
-    output.close()
+    with open('rookie_seasons_data.out', 'w') as output:
+        with open('../player_urls/player_urls.out', 'r') as f: 
+            for player in f:
+                player = player.strip() 
+                parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/stats/{player}.php'))             
+                parser.first_td = True
+                    

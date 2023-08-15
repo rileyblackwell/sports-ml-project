@@ -44,20 +44,15 @@ class SKillScoreParser(HTMLParser):
             self.start_of_data = True           
                
 if __name__ == '__main__':
-    parser = SKillScoreParser()
-    output = open('skill_scores.out', 'w')
-
-    with open('player_urls.out', 'r') as f:  
-        # i = 0
-        for player in f:           
-            player = player.strip() 
-            season = 2018
-            while season <= 2021:
-                parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php?season={season}'))
-                season += 1
-            parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))
-            output.write('\n')               
-            # if i == 50:
-            #     break
-            # i += 1  
-    output.close()
+    parser = SKillScoreParser()   
+    with open('skill_scores.out', 'w') as output:
+        with open('../player_urls/player_urls.out', 'r') as f:          
+            for player in f:           
+                player = player.strip() 
+                season = 2018
+                while season <= 2021:
+                    parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php?season={season}'))
+                    season += 1
+                parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))
+                output.write('\n')               
+          

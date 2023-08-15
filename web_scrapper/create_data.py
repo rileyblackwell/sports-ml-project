@@ -1,5 +1,5 @@
 def create_dst_rankings_dictionary():
-    with open('dst_rankings.out') as f:
+    with open('dst_rankings_and_encodings/dst_rankings.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
@@ -17,7 +17,7 @@ def create_dst_rankings_dictionary():
     return dst_rankings
 
 def create_dst_encodings_dictionary():
-    with open('dst_encodings.out') as f:
+    with open('dst_rankings_and_encodings/dst_encodings.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
@@ -27,7 +27,7 @@ def create_dst_encodings_dictionary():
     return dst_encodings
 
 def create_skill_score():
-    with open('skill_scores.out') as f:
+    with open('skill_scores/skill_scores.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
@@ -50,7 +50,7 @@ def create_skill_score():
 
 def create_seasons_played():
     def create_rookie_season():
-        with open('rookie_seasons_data.out') as f:
+        with open('rookie_seasons/rookie_seasons_data.out') as f:
             data = f.readlines()
             data = [line.strip() for line in data]
             data = [line.split(',') for line in data]
@@ -70,7 +70,7 @@ def create_seasons_played():
     return seasons_played
 
 def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played):
-    with open('weekly_data.out') as f:
+    with open('weekly_data/weekly_data.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
