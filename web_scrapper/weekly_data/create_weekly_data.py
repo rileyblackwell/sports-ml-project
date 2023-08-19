@@ -34,8 +34,8 @@ class WeeklyDataParser(HTMLParser):
                
 if __name__ == '__main__':
     parser = WeeklyDataParser()    
-    with open('testing_weekly_data.out', 'w') as output:
-        with open('../player_urls/testing_player_urls.out', 'r') as f: 
+    with open('weekly_data.out', 'w') as output:
+        with open('../player_urls/player_urls.out', 'r') as f: 
             for player in f:
                 player = player.strip() 
                 for season in range(2020, 2022):                   
