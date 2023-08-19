@@ -119,8 +119,11 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played
                     dst_rank = dst_rankings[(season, week, dst)]
                     dst_encode = dst_encodings[dst]        
                     params[2] += f'{week}, '
-                    params[1] += f'{season}, '   
-                    fantasy_points = line[17][1:]
+                    params[1] += f'{season}, '
+                    if len(line) == 20: # handles error with data for joe mixon and devin singletary   
+                        fantasy_points = line[17][1:]
+                    else:
+                        fantasy_points = '-'    
                     params[5] += skill_scores[player] + ', '
                     params[6] += seasons_played[player][season - 1] + ', '
                     params[7] += f'{player + 1}, '

@@ -28,8 +28,8 @@ class WeeklyDataParser(HTMLParser):
                 if data == 'Week 1':
                     self.output.write('\n')
                 if data[:34] == 'Player does not have any game data': 
-                    self.output.write('\n\n')
-                           
+                    self.output.write('\n\n')                        
+            
             self.output.write(f"{data}, ")
             self.start_of_data = True           
 
