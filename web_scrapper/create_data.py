@@ -1,5 +1,5 @@
 def create_dst_rankings_dictionary():
-    with open('dst_rankings_and_encodings/dst_rankings.out') as f:
+    with open('dst_id_and_rankings/dst_rankings.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
@@ -15,8 +15,8 @@ def create_dst_rankings_dictionary():
             dst_rankings[(season, week, line[1][1:])] = line[0]           
     return dst_rankings
 
-def create_dst_encodings_dictionary():
-    with open('dst_rankings_and_encodings/dst_encodings.out') as f:
+def create_dst_id_dictionary():
+    with open('dst_id_and_rankings/dst_id.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
@@ -148,7 +148,7 @@ def create_data_txt(player_data, filename = 'data.txt'):
             output.write('\n')
     
 if __name__ == '__main__':   
-    player_data = create_player_data(create_dst_rankings_dictionary(), create_dst_encodings_dictionary(),
+    player_data = create_player_data(create_dst_rankings_dictionary(), create_dst_id_dictionary(),
                                      create_skill_score(), create_seasons_played(), 8)
     create_data_txt(player_data)
       

@@ -52,6 +52,6 @@ if __name__ == '__main__':
             output.write('end of season\n')    
   
     # create dst encodings
-    with open('dst_encodings.out', 'w') as output:
+    with open('dst_id.out', 'w') as output:
         parser.feed(get_web_page('https://www.fantasypros.com/nfl/stats/dst.php?year=2017'))  
   

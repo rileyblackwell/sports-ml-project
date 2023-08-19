@@ -5,10 +5,11 @@ def get_web_page(url):
     return requests.get(url).content.decode('utf-8')
 
 class WeeklyDataParser(HTMLParser):
-    def __init__(self):
+    def __init__(self, output):
         super().__init__()     
         self.in_td_tag = False
         self.first_td = True
+        self.output = output
          
     def handle_starttag(self, tag, attrs):         
         if tag == 'td':
@@ -21,15 +22,18 @@ class WeeklyDataParser(HTMLParser):
     def handle_data(self, data):
         if self.in_td_tag:                   
             if self.first_td:
-                output.write(f'{data}\n')
+                self.output.write(f'{data}\n')
                 self.first_td = False
-                    
-if __name__ == '__main__':
-    parser = WeeklyDataParser()
-    with open('rookie_seasons_data.out', 'w') as output:
-        with open('../player_urls/player_urls.out', 'r') as f: 
+
+def main(input_file = '../player_urls/player_urls.out', output_file = 'rookie_seasons_data.out'):
+    with open(output_file, 'w') as output:
+        parser = WeeklyDataParser(output)
+        with open(input_file, 'r') as f: 
             for player in f:
                 player = player.strip() 
                 parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/stats/{player}.php'))             
-                parser.first_td = True
+                parser.first_td = True                    
+
+if __name__ == '__main__':
+   main()
                     
