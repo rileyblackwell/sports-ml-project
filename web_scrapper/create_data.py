@@ -128,9 +128,6 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played
             params[12] = create_game_average(params[0], 7)
             params[13] = create_game_average(params[0], 8)
             params[14] = create_game_average(params[0], 9)
-            params[15] = create_game_average(params[0], 10)
-            params[16] = create_game_average(params[0], 11)
-            params[17] = create_game_average(params[0], 12)
             player_data = add_player_data(player_data, params)
             params = initialize_params(num_params)
             player += 1
@@ -181,6 +178,6 @@ def create_data_txt(player_data, filename = 'data.txt'):
     
 if __name__ == '__main__':   
     player_data = create_player_data(create_dst_rankings_dictionary(), create_dst_id_dictionary(),
-                                     create_skill_score(), create_seasons_played(), 18)
+                                     create_skill_score(), create_seasons_played(), 15)
     create_data_txt(player_data)
       
