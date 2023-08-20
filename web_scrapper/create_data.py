@@ -77,11 +77,13 @@ def add_player_data(player_data, params):
         player_data.append(f'{param[:-2]}\n')
     return player_data
 
-def player_missed_season(params, num_games):
+def player_missed_season(params, num_games, player_id):
     new_params = []
-    for param in params:
+    for param in params[:-1]:
         param += '0, ' * num_games
         new_params.append(param)
+    params[-1] += f'{player_id}, ' * num_games
+    new_params.append(params[-1])   
     return new_params
 
 def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played, num_params, 
@@ -109,7 +111,7 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played
             num_games = 16
             if season >= 2: # NFL changed schedule to 17 games in 2021
                 num_games = 17                      
-            params = player_missed_season(params, num_games)     
+            params = player_missed_season(params, num_games, player + 1)     
         else:               
             try: 
                 dst = line[1][1:].replace('@ ', '').replace('vs. ', '') # Remove @ and vs. from dst name
@@ -121,6 +123,7 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played
                     fantasy_points = line[17][1:]
                     params[5] += skill_scores[player] + ', '
                     params[6] += seasons_played[player][season - 1] + ', '
+                    params[7] += f'{player + 1}, '
                     week += 1   
                     if fantasy_points == '-':              
                         params[0] += '0, '
@@ -146,6 +149,6 @@ def create_data_txt(player_data, filename = 'data.txt'):
     
 if __name__ == '__main__':   
     player_data = create_player_data(create_dst_rankings_dictionary(), create_dst_encodings_dictionary(),
-                                     create_skill_score(), create_seasons_played(), 7)
+                                     create_skill_score(), create_seasons_played(), 8)
     create_data_txt(player_data)
       
