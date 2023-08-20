@@ -66,6 +66,25 @@ def create_seasons_played(filename = 'rookie_seasons/rookie_seasons_data.out'):
         seasons_played.append(seasons)    
     return seasons_played
 
+# NOTE - 7 game average will also include games from the previous season
+def create_7_game_average(fantasy_points):
+    games = fantasy_points[:-2].split(', ')
+    games = [float(game) for game in games]
+    game_data = ''
+    for i in range(len(games)):
+        games_played = 0
+        seven_game_average = 0.0
+        for j in range(i-7, i):
+            if j >= 0:
+                seven_game_average += games[j]
+                if games[j] != 0.0:
+                    games_played += 1
+        if games_played != 0:
+            game_data += str(round(seven_game_average / games_played, 2)) + ', '
+        else:
+            game_data += '0.0' + ', '                                          
+    return game_data
+
 def initialize_params(num_params):
     params = []
     for _ in range(num_params):
@@ -86,8 +105,8 @@ def player_missed_season(params, num_games, player_id):
     new_params.append(params[-1])   
     return new_params
 
-def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played, num_params, 
-                       filename = 'weekly_data/weekly_data.out'):
+def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played, 
+                       num_params, filename = 'weekly_data/weekly_data.out'):
     with open(filename) as f:
         data = f.readlines()
         data = [line.strip() for line in data]
@@ -102,6 +121,7 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played
             season += 1       
         
         if season == 4:
+            params[8] = create_7_game_average(params[0])
             player_data = add_player_data(player_data, params)
             params = initialize_params(num_params)
             player += 1
@@ -152,6 +172,6 @@ def create_data_txt(player_data, filename = 'data.txt'):
     
 if __name__ == '__main__':   
     player_data = create_player_data(create_dst_rankings_dictionary(), create_dst_id_dictionary(),
-                                     create_skill_score(), create_seasons_played(), 8)
+                                     create_skill_score(), create_seasons_played(), 9)
     create_data_txt(player_data)
       

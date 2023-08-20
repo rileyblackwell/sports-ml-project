@@ -8,9 +8,9 @@ class TestCreateData(unittest.TestCase):
         dst_ids = create_dst_id_dictionary()
         skill_scores = create_skill_score('skill_scores/skill_scores_tests.out')
         seasons_played = create_seasons_played('rookie_seasons/rookie_seasons_data_tests.out')
-        player_data = create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played, 8,
-                                         'weekly_data/weekly_data_tests.out')
+        player_data = create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
+                                          9, 'weekly_data/weekly_data_tests.out')
         create_data_txt(player_data, 'create_data_tests.out')
-
+         
 if __name__ == '__main__':
     unittest.main()
