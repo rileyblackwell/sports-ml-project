@@ -5,7 +5,7 @@ def get_web_page(url):
     return requests.get(url).content.decode('utf-8')
 
 class SKillScoreParser(HTMLParser):
-    def __init__(self):
+    def __init__(self, output):
         super().__init__()     
         self.in_td_tag = False
         self.in_span_tag = False
@@ -13,6 +13,7 @@ class SKillScoreParser(HTMLParser):
         self.totals_row = float('inf')
         self.games_played = 0
         self.weeks_row = float('inf')
+        self.output = output
          
     def handle_starttag(self, tag, attrs):         
         if tag == 'td':
@@ -34,18 +35,18 @@ class SKillScoreParser(HTMLParser):
                               
                 if data == 'Totals':
                     self.totals_row = 0
-                    output.write(f'{self.games_played}, ')
+                    self.output.write(f'{self.games_played}, ')
                     self.games_played = 0                        
                 self.totals_row += 1  
                 if self.totals_row == 17:                       
-                    output.write(f"{data}\n")
+                    self.output.write(f"{data}\n")
           
             self.start_of_data = True           
-               
-if __name__ == '__main__':
-    parser = SKillScoreParser()   
-    with open('skill_scores.out', 'w') as output:
-        with open('../player_urls/player_urls.out', 'r') as f:          
+
+def main(input_file = '../player_urls/player_urls.out', output_file = 'skill_scores.out'):
+    with open(output_file, 'w') as output:
+        parser = SKillScoreParser(output)
+        with open(input_file, 'r') as f:          
             for player in f:           
                 player = player.strip() 
                 season = 2018
@@ -54,4 +55,7 @@ if __name__ == '__main__':
                     season += 1
                 parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))
                 output.write('\n')               
+
+if __name__ == '__main__':
+    main()           
           
