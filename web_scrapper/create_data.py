@@ -66,6 +66,25 @@ def create_seasons_played(filename = 'rookie_seasons/rookie_seasons_data.out'):
         seasons_played.append(seasons)    
     return seasons_played
 
+# NOTE - 7 game average will also include games from the previous season
+def create_game_average(fantasy_points, num_games):
+    games = fantasy_points[:-2].split(', ')
+    games = [float(game) for game in games]
+    game_data = ''
+    for i in range(len(games)):
+        games_played = 0
+        game_average = 0.0
+        for j in range(i-num_games, i):
+            if j >= 0:
+                game_average += games[j]
+                if games[j] != 0.0:
+                    games_played += 1
+        if games_played != 0:
+            game_data += str(round(game_average / games_played, 2)) + ', '
+        else:
+            game_data += '0.0' + ', '                                          
+    return game_data
+
 def initialize_params(num_params):
     params = []
     for _ in range(num_params):
@@ -86,8 +105,8 @@ def player_missed_season(params, num_games, player_id):
     new_params.append(params[-1])   
     return new_params
 
-def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played, num_params, 
-                       filename = 'weekly_data/weekly_data.out'):
+def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played, 
+                       num_params, filename = 'weekly_data/weekly_data.out'):
     with open(filename) as f:
         data = f.readlines()
         data = [line.strip() for line in data]
@@ -102,6 +121,13 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played
             season += 1       
         
         if season == 4:
+            params[8] = create_game_average(params[0], 3)
+            params[9] = create_game_average(params[0], 4)
+            params[10] = create_game_average(params[0], 5)
+            params[11] = create_game_average(params[0], 6)
+            params[12] = create_game_average(params[0], 7)
+            params[13] = create_game_average(params[0], 8)
+            params[14] = create_game_average(params[0], 9)
             player_data = add_player_data(player_data, params)
             params = initialize_params(num_params)
             player += 1
@@ -119,8 +145,11 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played
                     dst_rank = dst_rankings[(season, week, dst)]
                     dst_encode = dst_encodings[dst]        
                     params[2] += f'{week}, '
-                    params[1] += f'{season}, '   
-                    fantasy_points = line[17][1:]
+                    params[1] += f'{season}, '
+                    if len(line) == 20: # handles error with data for joe mixon and devin singletary   
+                        fantasy_points = line[17][1:]
+                    else:
+                        fantasy_points = '-'    
                     params[5] += skill_scores[player] + ', '
                     params[6] += seasons_played[player][season - 1] + ', '
                     params[7] += f'{player + 1}, '
@@ -149,6 +178,6 @@ def create_data_txt(player_data, filename = 'data.txt'):
     
 if __name__ == '__main__':   
     player_data = create_player_data(create_dst_rankings_dictionary(), create_dst_id_dictionary(),
-                                     create_skill_score(), create_seasons_played(), 8)
+                                     create_skill_score(), create_seasons_played(), 15)
     create_data_txt(player_data)
       
