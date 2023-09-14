@@ -24,9 +24,9 @@ class TestCreateData(unittest.TestCase):
         teams_ids = create_team_ids(create_dst_id_dictionary(), '../team_id/team_id_tests.out')
         roster = create_roster(teams_ids)
 
-    # def test_create_depth_chart(self):
-    #     teams_ids = create_team_ids(create_dst_id_dictionary(), '../team_id/team_id_tests.out')
-    #     depth_chart = create_depth_chart(create_roster(teams_ids), create_fantasy_points('../weekly_data/weekly_data_tests.out'))
+    def test_create_depth_chart(self):
+        teams_ids = create_team_ids(create_dst_id_dictionary())
+        depth_chart = create_depth_chart(create_roster(teams_ids), create_fantasy_points())
        
 
 if __name__ == '__main__':
