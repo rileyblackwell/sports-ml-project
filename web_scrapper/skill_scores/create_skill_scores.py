@@ -50,10 +50,9 @@ def main(input_file = '../player_urls/player_urls.out', output_file = 'skill_sco
             for player in f:           
                 player = player.strip() 
                 season = 2018
-                while season <= 2021:
+                while season < 2023:
                     parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php?season={season}'))
                     season += 1
-                parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))
                 output.write('\n')               
 
 if __name__ == '__main__':
