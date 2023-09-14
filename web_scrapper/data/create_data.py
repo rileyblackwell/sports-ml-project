@@ -31,7 +31,7 @@ def add_player_data(player_data, params):
         player_data.append(f'{param[:-2]}\n')
     return player_data
 
-def player_missed_season(params, num_games, player_id):
+def player_missed_season(params, num_games):
     """
     Updates the parameters for a player to indicate missed games in a season.
 
@@ -77,7 +77,7 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played
             num_games = 16
             if season >= 2: # NFL changed schedule to 17 games in 2021
                 num_games = 17                      
-            params = player_missed_season(params, num_games, player + 1)     
+            params = player_missed_season(params, num_games)     
         else:               
             try: 
                 dst = line[1][1:].replace('@ ', '').replace('vs. ', '') # Removes @ and vs. from dst name

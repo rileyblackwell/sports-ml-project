@@ -168,3 +168,151 @@ def create_game_average(fantasy_points, num_games):
         else:
             game_data += '0.0' + ', '
     return game_data
+
+def create_fantasy_points(filename='../weekly_data/weekly_data.out'):
+    """
+    Creates a list of fantasy points for each player.
+
+    Args:
+        filename (str): Path to the file containing weekly data.
+
+    Returns:
+        dict: A dictionary with keys as tuples (player_id, season) and values as fantasy points.
+    """
+    with open(filename) as f:
+        data = f.readlines()
+        data = [line.strip() for line in data]
+        data = [line.split(',') for line in data]
+
+    fantasy_points = {}
+    player_fantasy_points = []
+    season = 1
+    player_id = 1
+    for line in data:
+        if line[0] == '':
+            season += 1
+            fantasy_points[(player_id, season - 1)] = player_fantasy_points
+            player_fantasy_points = []
+            if season == 4:
+                season = 1
+                player_id += 1
+        
+        if line[0][:34] == 'Player does not have any game data':         
+            num_games = 16
+            if season >= 2: # NFL changed schedule to 17 games in 2021
+                num_games = 17
+            for _  in range(num_games):
+                player_fantasy_points.append('0.0')
+        else: 
+            if line[0] == 'Totals':
+                pass
+            else:
+                try:
+                    player_fantasy_points.append(line[17][1:])
+                except IndexError: # bye week
+                    pass
+    return fantasy_points
+
+def create_roster(team_ids):
+    """
+    Creates a list of players on each team.
+
+    Args:
+        team_ids (list): A list of dictionaries, each containing season-wise team IDs.
+
+    Returns: roster (dict): A dictionary with keys as tuples (season, team_id) and values as lists of player_ids.
+    """
+    player_id = 1
+    roster = {}
+    season = 1
+    for player in team_ids:
+        for season in player:
+            
+            current_roster = roster.get((season, player[season]))  
+            if current_roster is None:
+                roster[(season, player[season])] = [player_id] # (season, team_id) : [player_id]
+            else:
+                roster[(season, player[season])].append(player_id)
+
+            season += 1
+        player_id += 1
+
+    return roster
+
+def fantasy_points_list_to_string(fantasy_points):
+    """
+    Converts fantasy points from a list to a string.
+
+    Args:
+        fantasy_points (list): A list of fantasy points.
+
+    Returns:
+        str: A comma-separated string of fantasy points.
+    """
+    fantasy_points_str = ''
+    for points in fantasy_points:
+        if points == '-':
+            fantasy_points_str += '0.0, '
+        else:
+            fantasy_points_str += points + ', '
+    return fantasy_points_str  
+
+def get_games_in_season(team_game_averages):
+    """
+    Gets the number of games in a season.
+
+    Args: 
+        team_game_averages (dict): A dictionary with keys as player_ids and values as game averages.
+
+    Returns:
+        int: The number of games in a season.
+    """
+    for average in team_game_averages.values():
+        game_average = average[:-2].split(', ')
+        return len(game_average)  
+
+def create_depth_chart(rosters, fantasy_points):
+    """
+    
+
+    Args:
+        rosters (dict): A dictionary with keys as tuples (season, team_id) and values as lists of player_ids.
+        fantasy_points (dict): A dictionary with keys as tuples (player_id, season) and values as fantasy points.
+    
+    """
+    depth_chart = {}
+    for team in rosters.items():
+        team_id = team[0][1]
+        season_id = team[0][0]
+        players = team[1]
+        
+        # store the fantasy points for each player on the team
+        team_fantasy_points = {}
+        for player_id in players:
+            team_fantasy_points[player_id] = fantasy_points[(player_id, season_id)]
+        
+        # calculate the 3 game averages for each player on the team
+        team_game_averages = {}
+        for player in players:
+            player_fantasy_points = team_fantasy_points[player]
+            fantasy_points_str = fantasy_points_list_to_string(player_fantasy_points)
+            team_game_averages[player] = create_game_average(fantasy_points_str, 3)    
+        
+        for week in range(get_games_in_season(team_game_averages)):
+            sorted_game_averages = []
+            player_id = 1
+            for game_average in team_game_averages.values():
+                game_average = game_average[:-2].split(', ')
+                sorted_game_averages.append((player_id, team_id, float(game_average[week])))
+                player_id += 1
+
+            sorted_game_averages.sort(key=lambda x: x[2], reverse=True)
+            rank = 1 
+            for player in sorted_game_averages:
+                if week == 0:
+                    depth_chart[(player[0], season_id, player[1])] = [rank]
+                else:
+                    depth_chart[(player[0], season_id, player[1])].append(rank)
+                rank += 1      
+
+    return depth_chart
