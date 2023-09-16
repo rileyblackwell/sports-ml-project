@@ -1,5 +1,6 @@
 from create_params import create_dst_rankings_dictionary, create_dst_id_dictionary, create_team_ids 
-from create_params import create_skill_score, create_seasons_played, create_game_average
+from create_params import create_skill_score, create_seasons_played, create_game_average, create_depth_chart
+from create_params import create_fantasy_points, create_roster
 
 def initialize_params(num_params):
     """
@@ -51,7 +52,7 @@ def player_missed_season(params, num_games):
 
 
 def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played,
-                       teams_ids, num_params, filename = '../weekly_data/weekly_data.out'):
+                       teams_ids, depth_chart, num_params, filename = '../weekly_data/weekly_data.out'):
     with open(filename) as f:
         data = f.readlines()
         data = [line.strip() for line in data]
@@ -92,7 +93,7 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played
                         fantasy_points = '-'    
                     params[5] += f'{skill_scores[player]}, '
                     params[6] += f'{seasons_played[player][season - 1]}, '
-                    params[7] += f'{player + 1}, '
+                    params[7] += f'{player + 1}, '                    
                     try:
                         params[15] += f'{teams_ids[player][season]}, '
                     except KeyError:
@@ -101,11 +102,13 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played
                     if fantasy_points == '-':              
                         params[0] += '0, '
                         params[3] += '0, '
-                        params[4] += '0, '                                           
+                        params[4] += '0, ' 
+                        params[16] += '0, '                                          
                     else:
                         params[0] += fantasy_points + ', ' 
                         params[3] += dst_rank + ', '
-                        params[4] += dst_encode + ', '                                                   
+                        params[4] += dst_encode + ', '
+                        params[16] += f'{depth_chart[(player + 1, season)][week - 2]}, ' # -2 because week starts at 0                                                                          
                 except KeyError:
                     pass              
             except IndexError:
@@ -133,8 +136,14 @@ def create_data_txt(player_data, filename='data.txt'):
 
     
 if __name__ == '__main__':
-    dst_ids = create_dst_id_dictionary()   
-    player_data = create_player_data(create_dst_rankings_dictionary(), dst_ids, create_skill_score(), 
-                                     create_seasons_played(), create_team_ids(dst_ids), 16)
+    dst_rankings = create_dst_rankings_dictionary()
+    dst_ids = create_dst_id_dictionary()
+    skill_scores = create_skill_score()
+    seasons_played = create_seasons_played()
+    team_ids = create_team_ids(dst_ids)
+    depth_chart =  create_depth_chart(create_roster(team_ids), create_fantasy_points())   
+    
+    player_data = create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played, team_ids, 
+                                     depth_chart, 17)
     create_data_txt(player_data)
       

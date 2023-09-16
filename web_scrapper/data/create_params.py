@@ -297,19 +297,19 @@ def create_depth_chart(rosters, fantasy_points):
             team_game_averages[player_id] = create_game_average(fantasy_points_str, 3)
         
         for week in range(get_games_in_season(team_game_averages)):
-            sorted_game_averages = []
+            game_averages_rankings = []
             for player_game_averages in team_game_averages.items():
                 game_averages = player_game_averages[1][:-2].split(', ')
-                sorted_game_averages.append((player_game_averages[0], team_id, float(game_averages[week])))
+                game_averages_rankings.append((player_game_averages[0], team_id, float(game_averages[week])))
 
             # rank players on the depth chart by highest to lowest 3 game averages    
-            sorted_game_averages.sort(key=lambda x: x[2], reverse=True)
+            game_averages_rankings.sort(key=lambda x: x[2], reverse=True)
             rank = 1 
-            for player in sorted_game_averages:
+            for player in game_averages_rankings:
                 if week == 0:
-                    depth_chart[(player[0], season_id, player[1])] = [rank]
+                    depth_chart[(player[0], season_id)] = [0] # intialize depth chart ranking to 0
                 else:
-                    depth_chart[(player[0], season_id, player[1])].append(rank)
+                    depth_chart[(player[0], season_id)].append(rank) # (player_id, season, team_id) : [rank]
                 rank += 1      
 
     return depth_chart
