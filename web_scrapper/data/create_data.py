@@ -108,7 +108,10 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played
                         params[0] += fantasy_points + ', ' 
                         params[3] += dst_rank + ', '
                         params[4] += dst_encode + ', '
-                        params[16] += f'{depth_chart[(player + 1, season)][week - 2]}, ' # -2 because week starts at 0                                                                          
+                        try:
+                            params[16] += f'{depth_chart[(player + 1, season)][week - 2]}, ' # -2 because week starts at 0
+                        except KeyError: # fixes error with jk dobbins data
+                            params[16] += '0, '                                                                                
                 except KeyError:
                     pass              
             except IndexError:
