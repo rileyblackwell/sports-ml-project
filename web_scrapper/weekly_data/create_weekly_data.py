@@ -39,9 +39,8 @@ def main(input_file = '../player_urls/player_urls.out', output_file = 'weekly_da
         with open(input_file, 'r') as f: 
             for player in f:
                 player = player.strip() 
-                for season in range(2020, 2022):                   
-                    parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php?season={season}'))
-                parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php'))               
+                for season in range(2020, 2023):                   
+                    parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php?season={season}'))              
         output.write('\n\n') # prevents a bug in create_data.py where player data isn't outputted.               
 
 if __name__ == '__main__':

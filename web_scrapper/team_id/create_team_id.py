@@ -40,13 +40,13 @@ def main(input_filename = '../player_urls/player_urls.out', output_filename = 't
               
                 # outputs the team id for the last 3 seasons   
                 if len(teams) >= 8:
-                    for team in teams[-8:-2]:
+                    for team in teams[-10:-4]: # teams played for 2020, 2021, 2022
                         output.write(team)
                 elif len(teams) == 6:
-                    for team in teams[-6:-2]:
+                    for team in teams[-8:-4]:
                         output.write(team)
                 elif len(teams) == 4:
-                    for team in teams[-4:-2]:
+                    for team in teams[-6:-4]:
                         output.write(team)
                 else:
                     raise IndexError('Error: player was never on a team for the last 3 seasons')
