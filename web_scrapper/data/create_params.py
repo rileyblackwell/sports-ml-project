@@ -240,18 +240,7 @@ def create_roster(team_ids):
 
     return roster 
 
-def create_depth_chart(rosters, fantasy_points):
-    """
-    Creates a weekly depth chart ranking for each player.
-
-    Args:
-        rosters (dict): A dictionary with keys as tuples (season, team_id) and values as lists of player_ids.
-        fantasy_points (dict): A dictionary with keys as tuples (player_id, season) and values as fantasy points.
-    
-    Returns:
-        dict: A dictionary with keys as tuples (player_id, season, team_id) and values as lists of depth chart rankings.
-    """
-    def fantasy_points_list_to_string(fantasy_points):
+def fantasy_points_list_to_string(fantasy_points):
         """
         Converts fantasy points from a list to a string.
 
@@ -269,47 +258,87 @@ def create_depth_chart(rosters, fantasy_points):
                 fantasy_points_str += points + ', '
         return fantasy_points_str  
 
-    def get_games_in_season(team_game_averages):
-        """
-        Gets the number of games in a season.
+def get_games_in_season(team_game_averages):
+    """
+    Gets the number of games in a season.
+    Args: 
+        team_game_averages (dict): A dictionary with keys as player_ids and values as game averages.
+    Returns:
+        int: The number of games in a season.
+    """
+    for average in team_game_averages.values():
+        game_average = average[:-2].split(', ')
+        return len(game_average) 
 
-        Args: 
-            team_game_averages (dict): A dictionary with keys as player_ids and values as game averages.
+def check_for_players_tied_on_depth_chart(game_averages_rankings, player_id, rank):
+    """
+    Checks if there are players tied on the depth chart.
+    Args:
+        game_averages_rankings (list): A list of tuples containing player_ids, team_ids, and game averages.
+        players_on_team (int): The number of players on the team.
+        rank (int): The current depth chart rank.
+    Returns:
+        int: The current depth chart rank.
+    """
+    tolerance = 4
+    if player_id - 1 >= 0: 
+        if game_averages_rankings[player_id - 1][2] - game_averages_rankings[player_id][2] < tolerance: 
+            rank -= .5
+    if player_id + 1 < len(game_averages_rankings):
+        if game_averages_rankings[player_id][2] - game_averages_rankings[player_id + 1][2] < tolerance:
+            rank += .5
+    return rank    
 
-        Returns:
-            int: The number of games in a season.
-        """
-        for average in team_game_averages.values():
-            game_average = average[:-2].split(', ')
-            return len(game_average) 
+def calculate_team_game_averages(fantasy_points, players, season_id):
+    """
+    Calculates the 5 game averages for each player on the team.
+    Args:
+        players (list): A list of player_ids.
+        season_id (int): The season.
+    Returns:
+        dict: A dictionary with keys as player_ids and values as game averages.
+    """
+    team_game_averages = {}
+    for player_id in players:
+        player_fantasy_points = fantasy_points[(player_id, season_id)]
+        fantasy_points_str = fantasy_points_list_to_string(player_fantasy_points)
+        team_game_averages[player_id] = create_game_average(fantasy_points_str, 5)
+    return team_game_averages
+
+def create_depth_chart(rosters, fantasy_points):
+    """
+    Creates a weekly depth chart ranking for each player.
+
+    Args:
+        rosters (dict): A dictionary with keys as tuples (season, team_id) and values as lists of player_ids.
+        fantasy_points (dict): A dictionary with keys as tuples (player_id, season) and values as fantasy points.
     
+    Returns:
+        dict: A dictionary with keys as tuples (player_id, season, team_id) and values as lists of depth chart rankings.
+    """
     depth_chart = {}
     for team in rosters.items():
         team_id = team[0][1]
         season_id = team[0][0]
         players = team[1]
         
-        # calculate the 3 game averages for each player on the team
-        team_game_averages = {}
-        for player_id in players:
-            player_fantasy_points = fantasy_points[(player_id, season_id)]
-            fantasy_points_str = fantasy_points_list_to_string(player_fantasy_points)
-            team_game_averages[player_id] = create_game_average(fantasy_points_str, 3)
+        team_game_averages = calculate_team_game_averages(fantasy_points, players, season_id)
         
         for week in range(get_games_in_season(team_game_averages)):
             game_averages_rankings = []
             for player_game_averages in team_game_averages.items():
                 game_averages = player_game_averages[1][:-2].split(', ')
                 game_averages_rankings.append((player_game_averages[0], team_id, float(game_averages[week])))
-
             # rank players on the depth chart by highest to lowest 3 game averages    
             game_averages_rankings.sort(key=lambda x: x[2], reverse=True)
-            rank = 1 
+            
+            players_id = 0 
             for player in game_averages_rankings:
+                rank = check_for_players_tied_on_depth_chart(game_averages_rankings, players_id, players_id + 1)
                 if week == 0:
                     depth_chart[(player[0], season_id)] = [0] # intialize depth chart ranking to 0
                 else:
                     depth_chart[(player[0], season_id)].append(rank) # (player_id, season, team_id) : [rank]
-                rank += 1      
+                players_id += 1      
 
     return depth_chart
