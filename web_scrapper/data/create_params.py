@@ -280,7 +280,7 @@ def check_for_players_tied_on_depth_chart(game_averages_rankings, player_id, ran
     Returns:
         int: The current depth chart rank.
     """
-    tolerance = 4
+    tolerance = 3
     if player_id - 1 >= 0: 
         if game_averages_rankings[player_id - 1][2] - game_averages_rankings[player_id][2] < tolerance: 
             rank -= .5
@@ -305,6 +305,23 @@ def calculate_team_game_averages(fantasy_points, players, season_id):
         team_game_averages[player_id] = create_game_average(fantasy_points_str, 5)
     return team_game_averages
 
+def check_if_player_missed_games(player_id, game_averages, fantasy_points, season_id):
+    """
+    Checks if a player missed a game and if True sets their game average for the week to 0.
+    Args:
+        team_game_averages (dict): A dictionary with keys as player_ids and values as game averages.
+        fantasy_points (dict): A dictionary with keys as tuples (player_id, season) and values as fantasy points.
+        season_id (int): The season.
+    Modifies:
+        team_game_averages so that weeks were a player didn't play are set to 0.
+    Returns:
+        dict: A dictionary with keys as player_ids and values as game averages.
+    """
+    for week, weekly_fantasy_points in enumerate(fantasy_points[(player_id, season_id)]):
+        if weekly_fantasy_points == '-':
+            game_averages[week] = '0.0'
+    return game_averages
+             
 def create_depth_chart(rosters, fantasy_points):
     """
     Creates a weekly depth chart ranking for each player.
@@ -323,11 +340,13 @@ def create_depth_chart(rosters, fantasy_points):
         players = team[1]
         
         team_game_averages = calculate_team_game_averages(fantasy_points, players, season_id)
+         
         
         for week in range(get_games_in_season(team_game_averages)):
             game_averages_rankings = []
             for player_game_averages in team_game_averages.items():
-                game_averages = player_game_averages[1][:-2].split(', ')
+                game_averages = check_if_player_missed_games(player_game_averages[0], player_game_averages[1][:-2].split(', '), 
+                                                             fantasy_points, season_id)
                 game_averages_rankings.append((player_game_averages[0], team_id, float(game_averages[week])))
             # rank players on the depth chart by highest to lowest 3 game averages    
             game_averages_rankings.sort(key=lambda x: x[2], reverse=True)
