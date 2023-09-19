@@ -280,18 +280,22 @@ def check_for_players_tied_on_depth_chart(game_averages_rankings, player_id, ran
     Returns:
         int: The current depth chart rank.
     """
-    tolerance = 3
+    tolerance = 1
     if player_id - 1 >= 0: 
         if game_averages_rankings[player_id - 1][2] - game_averages_rankings[player_id][2] < tolerance: 
             rank -= .5
+        elif game_averages_rankings[player_id - 1][2] - game_averages_rankings[player_id][2] < tolerance + 2: 
+            rank -= .25
     if player_id + 1 < len(game_averages_rankings):
         if game_averages_rankings[player_id][2] - game_averages_rankings[player_id + 1][2] < tolerance:
             rank += .5
+        elif game_averages_rankings[player_id][2] - game_averages_rankings[player_id + 1][2] < tolerance + 2:
+            rank += .25
     return rank    
 
 def calculate_team_game_averages(fantasy_points, players, season_id):
     """
-    Calculates the 5 game averages for each player on the team.
+    Calculates the 4 game averages for each player on the team.
     Args:
         players (list): A list of player_ids.
         season_id (int): The season.
@@ -302,7 +306,7 @@ def calculate_team_game_averages(fantasy_points, players, season_id):
     for player_id in players:
         player_fantasy_points = fantasy_points[(player_id, season_id)]
         fantasy_points_str = fantasy_points_list_to_string(player_fantasy_points)
-        team_game_averages[player_id] = create_game_average(fantasy_points_str, 5)
+        team_game_averages[player_id] = create_game_average(fantasy_points_str, 4)
     return team_game_averages
 
 def check_if_player_missed_games(player_id, game_averages, fantasy_points, season_id):
@@ -321,7 +325,30 @@ def check_if_player_missed_games(player_id, game_averages, fantasy_points, seaso
         if weekly_fantasy_points == '-':
             game_averages[week] = '0.0'
     return game_averages
-             
+
+def verify_depth_chart_ranking(player, rank):
+    """ 
+    Verifies that the depth chart ranking is correct.
+    Args:
+        player (tuple): A tuple containing player_id, team_id, and game average.
+        rank (int): The current depth chart rank.
+    Returns:
+        int: The current depth chart rank.
+    """
+    # if rank <= 1.5:
+    #     if player[2] < 5:
+    #         rank += 0.5
+    #         if player[2] < 3:
+    #             rank += 0.5          
+    # else:  
+    #     if player[2] < 3:
+    #         rank += 0.5
+            
+    if player[2] < 1:
+        rank = 4
+    
+    return rank
+
 def create_depth_chart(rosters, fantasy_points):
     """
     Creates a weekly depth chart ranking for each player.
@@ -341,7 +368,6 @@ def create_depth_chart(rosters, fantasy_points):
         
         team_game_averages = calculate_team_game_averages(fantasy_points, players, season_id)
          
-        
         for week in range(get_games_in_season(team_game_averages)):
             game_averages_rankings = []
             for player_game_averages in team_game_averages.items():
@@ -354,6 +380,7 @@ def create_depth_chart(rosters, fantasy_points):
             players_id = 0 
             for player in game_averages_rankings:
                 rank = check_for_players_tied_on_depth_chart(game_averages_rankings, players_id, players_id + 1)
+                rank = verify_depth_chart_ranking(player, rank)
                 if week == 0:
                     depth_chart[(player[0], season_id)] = [0] # intialize depth chart ranking to 0
                 else:
