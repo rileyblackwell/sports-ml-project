@@ -10,7 +10,8 @@ class TestCreateData(unittest.TestCase):
         skill_scores = create_skill_score('../skill_scores/skill_scores_tests.out')
         seasons_played = create_seasons_played('../rookie_seasons/rookie_seasons_data_tests.out')
         team_ids = create_team_ids(create_dst_id_dictionary(), '../team_id/team_id_tests.out')
-        depth_chart = create_depth_chart(create_roster(team_ids), create_fantasy_points('../weekly_data/weekly_data_tests.out'))
+        depth_chart = create_depth_chart(create_roster(team_ids), create_fantasy_points('../weekly_data/weekly_data_tests.out'),
+                                         create_skill_score('../skill_scores/skill_scores_tests.out'))
         player_data = create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
                                          team_ids, depth_chart, 17, '../weekly_data/weekly_data_tests.out')
         create_data_txt(player_data, 'create_data_tests.out')
@@ -27,7 +28,8 @@ class TestCreateData(unittest.TestCase):
 
     def test_create_depth_chart(self):
         teams_ids = create_team_ids(create_dst_id_dictionary(), '../team_id/team_id_tests.out')
-        depth_chart = create_depth_chart(create_roster(teams_ids), create_fantasy_points('../weekly_data/weekly_data_tests.out'))
+        depth_chart = create_depth_chart(create_roster(teams_ids), create_fantasy_points('../weekly_data/weekly_data_tests.out'),
+                                         create_skill_score('../skill_scores/skill_scores_tests.out'))
        
 
 if __name__ == '__main__':
