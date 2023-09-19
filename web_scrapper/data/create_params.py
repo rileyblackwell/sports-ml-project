@@ -357,17 +357,7 @@ def verify_depth_chart_ranking(player, rank):
     Returns:
         int: The current depth chart rank.
     """
-    game_average = player[2]
-    player_id = player[0]
-    # if rank <= 1.5:
-    #     if player[2] < 5:
-    #         rank += 0.5
-    #         if player[2] < 3:
-    #             rank += 0.5          
-    # else:  
-    #     if player[2] < 3:
-    #         rank += 0.5
-            
+    game_average = player[2]      
     if game_average < 1:
         rank = 4
     
@@ -403,12 +393,11 @@ def create_depth_chart(rosters, fantasy_points, skill_scores):
             
             players_id = 0 
             for player in game_averages_rankings:
-                rank = check_for_players_tied_on_depth_chart(game_averages_rankings, players_id, players_id + 1)
-                rank = verify_depth_chart_ranking(player, rank)
+                rank = verify_depth_chart_ranking(player, players_id + 1)
                 if week == 0:
-                    depth_chart[(player[0], season_id)] = [0] # intialize depth chart ranking to 0
+                    depth_chart[(player[0], season_id)] = [rank] # (player_id, season, team_id) : [rank]
                 else:
-                    depth_chart[(player[0], season_id)].append(rank) # (player_id, season, team_id) : [rank]
+                    depth_chart[(player[0], season_id)].append(rank)  
                 players_id += 1      
 
     return depth_chart
