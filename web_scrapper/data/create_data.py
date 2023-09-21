@@ -51,7 +51,7 @@ def player_missed_season(params, num_games):
     return new_params
 
 
-def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played,
+def create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
                        teams_ids, depth_chart, num_params, filename = '../weekly_data/weekly_data.out'):
     with open(filename) as f:
         data = f.readlines()
@@ -65,14 +65,14 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played
         if line[0] == '':             
             week = 1
             season += 1       
-        
-        if season == 4:
-            for i in range(3, 10): # 3 game average to 9 game average
-                params[i + 5] = create_game_average(params[0], i) 
-            player_data = add_player_data(player_data, params)
-            params = initialize_params(num_params)
-            player += 1
-            season = 1       
+            if season == 4:
+                for i in range(3, 10): # 3 game average to 9 game average
+                    params[i + 5] = create_game_average(params[0], i) 
+                player_data = add_player_data(player_data, params)
+                params = initialize_params(num_params)
+                player += 1
+                season = 1
+            continue           
         
         if line[0][:34] == 'Player does not have any game data':         
             num_games = 16
@@ -80,45 +80,43 @@ def create_player_data(dst_rankings, dst_encodings, skill_scores, seasons_played
                 num_games = 17                      
             params = player_missed_season(params, num_games)     
         else:               
-            try: 
-                dst = line[1][1:].replace('@ ', '').replace('vs. ', '') # Removes @ and vs. from dst name
+            dst = line[1][1:].replace('@ ', '').replace('vs. ', '') # Removes @ and vs. from dst name    
+            try:
+                dst_rank = dst_rankings[(season, week, dst)]
+                dst_id = dst_ids[dst]
+            except KeyError: # Handles bye weeks and season totals
+                continue         
+            
+            params[2] += f'{week}, '
+            params[1] += f'{season}, '
+            if len(line) == 20: # Handles error with data for joe mixon and devin singletary   
+                fantasy_points = line[17][1:]
+            else:
+                fantasy_points = '-'                    
+            params[5] += f'{skill_scores[player]}, '
+            params[6] += f'{seasons_played[player][season - 1]}, '
+            params[7] += f'{player + 1}, '                    
+            try:
+                params[15] += f'{teams_ids[player][season]}, '
+            except KeyError:
+                params[15] += '0, ' # Player did not play in the season
+            
+            
+            if fantasy_points == '-':              
+                for i in (0, 3, 4, 16): # 0 is fantasy points, 3 is dst rank, 4 is dst encoding, 16 is depth chart
+                    params[i] += '0, '                                          
+            else:
+                params[0] += fantasy_points + ', ' 
+                params[3] += dst_rank + ', '
+                params[4] += dst_id + ', '
                 try:
-                    dst_rank = dst_rankings[(season, week, dst)]
-                    dst_encode = dst_encodings[dst]        
-                    params[2] += f'{week}, '
-                    params[1] += f'{season}, '
-                    if len(line) == 20: # Handles error with data for joe mixon and devin singletary   
-                        fantasy_points = line[17][1:]
-                    else:
-                        fantasy_points = '-'    
-                    params[5] += f'{skill_scores[player]}, '
-                    params[6] += f'{seasons_played[player][season - 1]}, '
-                    params[7] += f'{player + 1}, '                    
-                    try:
-                        params[15] += f'{teams_ids[player][season]}, '
-                    except KeyError:
-                        params[15] += '0, ' # Player did not play in the season
-                    week += 1   
-                    if fantasy_points == '-':              
-                        params[0] += '0, '
-                        params[3] += '0, '
-                        params[4] += '0, ' 
-                        params[16] += '0, '                                          
-                    else:
-                        params[0] += fantasy_points + ', ' 
-                        params[3] += dst_rank + ', '
-                        params[4] += dst_encode + ', '
-                        try:
-                            params[16] += f'{depth_chart[(player + 1, season)][week - 2]}, ' # -2 because week starts at 0
-                        except KeyError: # fixes error with jk dobbins data
-                            params[16] += '0, '                                                                                
-                except KeyError:
-                    pass              
-            except IndexError:
-                pass
+                    params[16] += f'{depth_chart[(player + 1, season)][week - 1]}, ' 
+                except KeyError: # fixes error with jk dobbins data
+                    params[16] += '0, '  
+            week += 1                                                                                            
     return player_data
 
-def create_data_txt(player_data, filename='data.txt'):
+def create_data_csv(player_data, filename='../../fantasy_football/data.csv'):
     """
     Creates a text file with player data.
 
@@ -149,5 +147,5 @@ if __name__ == '__main__':
     
     player_data = create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played, team_ids, 
                                      depth_chart, 17)
-    create_data_txt(player_data)
+    create_data_csv(player_data)
       
