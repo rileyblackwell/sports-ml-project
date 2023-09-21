@@ -32,24 +32,25 @@ def add_player_data(player_data, params):
         player_data.append(f'{param[:-2]}\n')
     return player_data
 
-def player_missed_season(params, num_games):
+def player_missed_season(params, season):
     """
     Updates the parameters for a player to indicate missed games in a season.
 
     Args:
         params (list): A list of player parameters.
-        num_games (int): The number of games to mark as missed.
-        player_id (str): The unique identifier of the player.
+        season (int): The season in which the player missed games.
 
     Returns:
         list: The updated list of player parameters with missed games marked.
     """
+    num_games = 16
+    if season >= 2: # NFL changed schedule to 17 games in 2021
+        num_games = 17 
     new_params = []
     for param in params:
         param += '0, ' * num_games
         new_params.append(param)
     return new_params
-
 
 def create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
                        teams_ids, depth_chart, num_params, filename = '../weekly_data/weekly_data.out'):
@@ -74,11 +75,8 @@ def create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
                 season = 1
             continue           
         
-        if line[0][:34] == 'Player does not have any game data':         
-            num_games = 16
-            if season >= 2: # NFL changed schedule to 17 games in 2021
-                num_games = 17                      
-            params = player_missed_season(params, num_games)     
+        if line[0][:34] == 'Player does not have any game data':                                          
+            params = player_missed_season(params, season)     
         else:               
             dst = line[1][1:].replace('@ ', '').replace('vs. ', '') # Removes @ and vs. from dst name    
             try:
@@ -100,7 +98,6 @@ def create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
                 params[15] += f'{teams_ids[player][season]}, '
             except KeyError:
                 params[15] += '0, ' # Player did not play in the season
-            
             
             if fantasy_points == '-':              
                 for i in (0, 3, 4, 16): # 0 is fantasy points, 3 is dst rank, 4 is dst encoding, 16 is depth chart

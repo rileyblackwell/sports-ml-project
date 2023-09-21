@@ -268,30 +268,7 @@ def get_games_in_season(team_game_averages):
     """
     for average in team_game_averages.values():
         game_average = average[:-2].split(', ')
-        return len(game_average) 
-
-def check_for_players_tied_on_depth_chart(game_averages_rankings, player_id, rank):
-    """
-    Checks if there are players tied on the depth chart.
-    Args:
-        game_averages_rankings (list): A list of tuples containing player_ids, team_ids, and game averages.
-        players_on_team (int): The number of players on the team.
-        rank (int): The current depth chart rank.
-    Returns:
-        int: The current depth chart rank.
-    """
-    tolerance = 1
-    if player_id - 1 >= 0: 
-        if game_averages_rankings[player_id - 1][2] - game_averages_rankings[player_id][2] < tolerance: 
-            rank -= .5
-        elif game_averages_rankings[player_id - 1][2] - game_averages_rankings[player_id][2] < tolerance + 2: 
-            rank -= .25
-    if player_id + 1 < len(game_averages_rankings):
-        if game_averages_rankings[player_id][2] - game_averages_rankings[player_id + 1][2] < tolerance:
-            rank += .5
-        elif game_averages_rankings[player_id][2] - game_averages_rankings[player_id + 1][2] < tolerance + 2:
-            rank += .25
-    return rank    
+        return len(game_average)   
 
 def calculate_team_game_averages(fantasy_points, players, season_id, skill_scores):
     """
@@ -358,11 +335,38 @@ def verify_depth_chart_ranking(player, rank):
         int: The current depth chart rank.
     """
     game_average = player[2]      
-    if game_average < 1:
-        rank = 4
+    if rank == 1:
+        if game_average < 3.0:
+            rank += 1
     
+    # if rank == 2:
+    #     if game_average < 1.0:
+    #         rank += 1
     return rank
 
+def check_for_players_tied_on_depth_chart(game_averages_rankings, player_id, rank):
+    """
+    Checks if there are players tied on the depth chart.
+    Args:
+        game_averages_rankings (list): A list of tuples containing player_ids, team_ids, and game averages.
+        players_on_team (int): The number of players on the team.
+        rank (int): The current depth chart rank.
+    Returns:
+        int: The current depth chart rank.
+    """
+    tolerance = 1
+    if player_id - 1 >= 0: 
+        if game_averages_rankings[player_id - 1][2] - game_averages_rankings[player_id][2] < tolerance: 
+            rank -= .5
+        elif game_averages_rankings[player_id - 1][2] - game_averages_rankings[player_id][2] < tolerance + 2: 
+            rank -= .25
+    if player_id + 1 < len(game_averages_rankings):
+        if game_averages_rankings[player_id][2] - game_averages_rankings[player_id + 1][2] < tolerance:
+            rank += .5
+        elif game_averages_rankings[player_id][2] - game_averages_rankings[player_id + 1][2] < tolerance + 2:
+            rank += .25
+    return rank
+  
 def create_depth_chart(rosters, fantasy_points, skill_scores):
     """
     Creates a weekly depth chart ranking for each player.
@@ -391,13 +395,13 @@ def create_depth_chart(rosters, fantasy_points, skill_scores):
             # rank players on the depth chart by highest to lowest 3 game averages    
             game_averages_rankings.sort(key=lambda x: x[2], reverse=True)
             
-            players_id = 0 
+            rank = 1 
             for player in game_averages_rankings:
-                rank = verify_depth_chart_ranking(player, players_id + 1)
+                rank = verify_depth_chart_ranking(player, rank)
                 if week == 0:
                     depth_chart[(player[0], season_id)] = [rank] # (player_id, season, team_id) : [rank]
                 else:
                     depth_chart[(player[0], season_id)].append(rank)  
-                players_id += 1      
+                rank += 1      
 
     return depth_chart
