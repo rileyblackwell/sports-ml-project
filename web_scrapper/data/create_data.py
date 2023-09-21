@@ -116,7 +116,7 @@ def create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
             week += 1                                                                                            
     return player_data
 
-def create_data_txt(player_data, filename='data.txt'):
+def create_data_csv(player_data, filename='../../fantasy_football/data.csv'):
     """
     Creates a text file with player data.
 
@@ -147,5 +147,5 @@ if __name__ == '__main__':
     
     player_data = create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played, team_ids, 
                                      depth_chart, 17)
-    create_data_txt(player_data)
+    create_data_csv(player_data)
       

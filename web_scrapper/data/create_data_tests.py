@@ -1,7 +1,7 @@
 import unittest
 from create_params import create_dst_rankings_dictionary, create_dst_id_dictionary, create_skill_score
 from create_params import create_seasons_played, create_team_ids, create_fantasy_points, create_roster, create_depth_chart
-from create_data import create_player_data, create_data_txt
+from create_data import create_player_data, create_data_csv
 
 class TestCreateData(unittest.TestCase):
     def test_create_player_data(self):
@@ -14,7 +14,7 @@ class TestCreateData(unittest.TestCase):
                                          create_skill_score('../skill_scores/skill_scores_tests.out'))
         player_data = create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
                                          team_ids, depth_chart, 17, '../weekly_data/weekly_data_tests.out')
-        create_data_txt(player_data, 'create_data_tests.out')
+        create_data_csv(player_data, 'create_data_tests.csv')
 
     def test_create_team_ids(self):
         teams_ids = create_team_ids(create_dst_id_dictionary(), '../team_id/team_id_tests.out')     
