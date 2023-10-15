@@ -5,7 +5,7 @@ def create_dst_rankings_dictionary():
     Returns:
         dict: A dictionary with keys as tuples (season, week, team_name) and values as rankings.
     """
-    with open('../dst_id_and_rankings/dst_rankings.out') as f:
+    with open('web_scrapper/dst_id_and_rankings/dst_rankings.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
@@ -30,7 +30,7 @@ def create_dst_id_dictionary():
     Returns:
         dict: A dictionary with keys as DST names and values as IDs.
     """
-    with open('../dst_id_and_rankings/dst_id.out') as f:
+    with open('web_scrapper/dst_id_and_rankings/dst_id.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
@@ -41,7 +41,7 @@ def create_dst_id_dictionary():
     return dst_ids
 
 
-def create_team_ids(dst_ids, filename='../team_id/team_id.out'):
+def create_team_ids(dst_ids, filename='web_scrapper/team_id/team_id.out'):
     """
     Creates a list of dictionaries containing team IDs for each season.
 
@@ -79,7 +79,7 @@ def create_team_ids(dst_ids, filename='../team_id/team_id.out'):
     return team_ids
 
 
-def create_skill_score(filename='../skill_scores/skill_scores.out'):
+def create_skill_score(filename='web_scrapper/skill_scores/skill_scores.out'):
     """
     Creates a list of skill scores.
 
@@ -110,7 +110,7 @@ def create_skill_score(filename='../skill_scores/skill_scores.out'):
     return skill_scores
 
 
-def create_seasons_played(filename='../rookie_seasons/rookie_seasons_data.out'):
+def create_seasons_played(filename='web_scrapper/rookie_seasons/rookie_seasons_data.out'):
     """
     Creates a list of number of seasons played for each player.
 
@@ -170,7 +170,7 @@ def create_game_average(fantasy_points, num_games):
             game_data += '0.0' + ', '
     return game_data
 
-def create_fantasy_points(filename='../weekly_data/weekly_data.out'):
+def create_fantasy_points(filename='web_scrapper/weekly_data/weekly_data.out'):
     """
     Creates a list of fantasy points for each player.
 
@@ -268,30 +268,7 @@ def get_games_in_season(team_game_averages):
     """
     for average in team_game_averages.values():
         game_average = average[:-2].split(', ')
-        return len(game_average) 
-
-def check_for_players_tied_on_depth_chart(game_averages_rankings, player_id, rank):
-    """
-    Checks if there are players tied on the depth chart.
-    Args:
-        game_averages_rankings (list): A list of tuples containing player_ids, team_ids, and game averages.
-        players_on_team (int): The number of players on the team.
-        rank (int): The current depth chart rank.
-    Returns:
-        int: The current depth chart rank.
-    """
-    tolerance = 1
-    if player_id - 1 >= 0: 
-        if game_averages_rankings[player_id - 1][2] - game_averages_rankings[player_id][2] < tolerance: 
-            rank -= .5
-        elif game_averages_rankings[player_id - 1][2] - game_averages_rankings[player_id][2] < tolerance + 2: 
-            rank -= .25
-    if player_id + 1 < len(game_averages_rankings):
-        if game_averages_rankings[player_id][2] - game_averages_rankings[player_id + 1][2] < tolerance:
-            rank += .5
-        elif game_averages_rankings[player_id][2] - game_averages_rankings[player_id + 1][2] < tolerance + 2:
-            rank += .25
-    return rank    
+        return len(game_average)   
 
 def calculate_team_game_averages(fantasy_points, players, season_id, skill_scores):
     """
@@ -358,11 +335,38 @@ def verify_depth_chart_ranking(player, rank):
         int: The current depth chart rank.
     """
     game_average = player[2]      
-    if game_average < 1:
-        rank = 4
+    if rank == 1:
+        if game_average < 3.0:
+            rank += 1
     
+    # if rank == 2:
+    #     if game_average < 1.0:
+    #         rank += 1
     return rank
 
+def check_for_players_tied_on_depth_chart(game_averages_rankings, player_id, rank):
+    """
+    Checks if there are players tied on the depth chart.
+    Args:
+        game_averages_rankings (list): A list of tuples containing player_ids, team_ids, and game averages.
+        players_on_team (int): The number of players on the team.
+        rank (int): The current depth chart rank.
+    Returns:
+        int: The current depth chart rank.
+    """
+    tolerance = 1
+    if player_id - 1 >= 0: 
+        if game_averages_rankings[player_id - 1][2] - game_averages_rankings[player_id][2] < tolerance: 
+            rank -= .5
+        elif game_averages_rankings[player_id - 1][2] - game_averages_rankings[player_id][2] < tolerance + 2: 
+            rank -= .25
+    if player_id + 1 < len(game_averages_rankings):
+        if game_averages_rankings[player_id][2] - game_averages_rankings[player_id + 1][2] < tolerance:
+            rank += .5
+        elif game_averages_rankings[player_id][2] - game_averages_rankings[player_id + 1][2] < tolerance + 2:
+            rank += .25
+    return rank
+  
 def create_depth_chart(rosters, fantasy_points, skill_scores):
     """
     Creates a weekly depth chart ranking for each player.
@@ -391,13 +395,13 @@ def create_depth_chart(rosters, fantasy_points, skill_scores):
             # rank players on the depth chart by highest to lowest 3 game averages    
             game_averages_rankings.sort(key=lambda x: x[2], reverse=True)
             
-            players_id = 0 
+            rank = 1 
             for player in game_averages_rankings:
-                rank = verify_depth_chart_ranking(player, players_id + 1)
+                rank = verify_depth_chart_ranking(player, rank)
                 if week == 0:
                     depth_chart[(player[0], season_id)] = [rank] # (player_id, season, team_id) : [rank]
                 else:
                     depth_chart[(player[0], season_id)].append(rank)  
-                players_id += 1      
+                rank += 1      
 
     return depth_chart

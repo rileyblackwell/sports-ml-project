@@ -48,11 +48,9 @@ def main(input_file = '../player_urls/player_urls.out', output_file = 'skill_sco
         parser = SKillScoreParser(output)
         with open(input_file, 'r') as f:          
             for player in f:           
-                player = player.strip() 
-                season = 2018
-                while season < 2023:
-                    parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php?season={season}'))
-                    season += 1
+                player = player.strip()   
+                for season in range(2018, 2023):
+                    parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php?season={season}'))                   
                 output.write('\n')               
 
 if __name__ == '__main__':
