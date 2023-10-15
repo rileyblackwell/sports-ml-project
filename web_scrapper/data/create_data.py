@@ -1,6 +1,6 @@
-from create_params import create_dst_rankings_dictionary, create_dst_id_dictionary, create_team_ids 
-from create_params import create_skill_score, create_seasons_played, create_game_average, create_depth_chart
-from create_params import create_fantasy_points, create_roster
+from web_scrapper.data.create_params import create_dst_rankings_dictionary, create_dst_id_dictionary, create_team_ids 
+from web_scrapper.data.create_params import create_skill_score, create_seasons_played, create_game_average, create_depth_chart
+from web_scrapper.data.create_params import create_fantasy_points, create_roster
 
 def initialize_params(num_params):
     """
@@ -53,7 +53,7 @@ def player_missed_season(params, season):
     return new_params
 
 def create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
-                       teams_ids, depth_chart, num_params, filename = '../weekly_data/weekly_data.out'):
+                       teams_ids, depth_chart, num_params, filename = 'web_scrapper/weekly_data/weekly_data.out'):
     with open(filename) as f:
         data = f.readlines()
         data = [line.strip() for line in data]
@@ -113,7 +113,7 @@ def create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
             week += 1                                                                                            
     return player_data
 
-def create_data_csv(player_data, filename='../../fantasy_football/data.csv'):
+def create_data_csv(player_data, filename='fantasy_football/data.csv'):
     """
     Creates a text file with player data.
 

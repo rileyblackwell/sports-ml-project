@@ -5,7 +5,7 @@ def create_dst_rankings_dictionary():
     Returns:
         dict: A dictionary with keys as tuples (season, week, team_name) and values as rankings.
     """
-    with open('../dst_id_and_rankings/dst_rankings.out') as f:
+    with open('web_scrapper/dst_id_and_rankings/dst_rankings.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
@@ -30,7 +30,7 @@ def create_dst_id_dictionary():
     Returns:
         dict: A dictionary with keys as DST names and values as IDs.
     """
-    with open('../dst_id_and_rankings/dst_id.out') as f:
+    with open('web_scrapper/dst_id_and_rankings/dst_id.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
@@ -41,7 +41,7 @@ def create_dst_id_dictionary():
     return dst_ids
 
 
-def create_team_ids(dst_ids, filename='../team_id/team_id.out'):
+def create_team_ids(dst_ids, filename='web_scrapper/team_id/team_id.out'):
     """
     Creates a list of dictionaries containing team IDs for each season.
 
@@ -79,7 +79,7 @@ def create_team_ids(dst_ids, filename='../team_id/team_id.out'):
     return team_ids
 
 
-def create_skill_score(filename='../skill_scores/skill_scores.out'):
+def create_skill_score(filename='web_scrapper/skill_scores/skill_scores.out'):
     """
     Creates a list of skill scores.
 
@@ -110,7 +110,7 @@ def create_skill_score(filename='../skill_scores/skill_scores.out'):
     return skill_scores
 
 
-def create_seasons_played(filename='../rookie_seasons/rookie_seasons_data.out'):
+def create_seasons_played(filename='web_scrapper/rookie_seasons/rookie_seasons_data.out'):
     """
     Creates a list of number of seasons played for each player.
 
@@ -170,7 +170,7 @@ def create_game_average(fantasy_points, num_games):
             game_data += '0.0' + ', '
     return game_data
 
-def create_fantasy_points(filename='../weekly_data/weekly_data.out'):
+def create_fantasy_points(filename='web_scrapper/weekly_data/weekly_data.out'):
     """
     Creates a list of fantasy points for each player.
 

@@ -1,167 +1,89 @@
-import create_skill_scores
-import create_weekly_data
+from web_scrapper.skill_scores import create_skill_scores
+from web_scrapper.weekly_data import create_weekly_data
+from web_scrapper.rookie_seasons import create_rookie_seasons
+from web_scrapper.team_id import create_team_id
+from web_scrapper.data.create_data import create_player_data, create_data_csv, create_depth_chart, create_fantasy_points 
+from web_scrapper.data.create_data import create_dst_rankings_dictionary, create_dst_id_dictionary, create_roster 
+from web_scrapper.data.create_data import create_seasons_played, create_skill_score, create_team_ids
 
-def create_dst_rankings_dictionary():
-    with open('dst_rankings.out') as f:
-        data = f.readlines()
-        data = [line.strip() for line in data]
-        data = [line.split(',') for line in data]
-    dst_rankings = {}
-    week = 0
-    season = 0
-    for line in data:
-        if line[0] == '':
-            week += 1
-        elif line[0] == 'end of season':
-            season += 1
-            week = 0    
+def create_player_outut_files():
+    """ Create the output files needed to create the player data for a single player.
+    """
+    create_skill_scores.main('web_scrapper/player_urls/validate_player_urls/validate_player_url.out', 
+                             'web_scrapper/player_urls/validate_player_urls/skill_scores.out')
+    
+    create_weekly_data.main('web_scrapper/player_urls/validate_player_urls/validate_player_url.out', 
+                            'web_scrapper/player_urls/validate_player_urls/weekly_data.out')
+    
+    create_rookie_seasons.main('web_scrapper/player_urls/validate_player_urls/validate_player_url.out', 
+                               'web_scrapper/player_urls/validate_player_urls/rookie_seasons.out')
+    
+    create_team_id.main('web_scrapper/player_urls/validate_player_urls/validate_player_url.out',
+                        'web_scrapper/player_urls/validate_player_urls/team_id.out')
+
+def validate_player_data(valid_output, error_output, player):
+    """ Test validate_data.csv to make sure it has the correct number of rows and columns for a single player.
+        If player data is valid, write player url to valid_output. Otherwise, write player url to error_output.
+
+        Parameters: valid_output (output stream), error_output (output stream) - output streams for valid and error player urls
+                    player (str) - player url
+        Mofiies: valid_output, error_output  
+    """
+    with open('web_scrapper/player_urls/validate_player_urls/validate_data.csv', 'r') as data_file:
+        data = data_file.read()
+        data = data.split('\n')
+        if len(data) == 18:
+            valid_lines = 0
+            for line in data:
+                line = line.split()
+                if len(line) == 50:
+                    valid_lines += 1
+            if valid_lines == 17:
+                valid_output.write(player + '\n')
+            else:
+                error_output.write(player + '\n')
         else:
-            dst_rankings[(season, week, line[1][1:])] = line[0]           
-    return dst_rankings
+            error_output.write(player + '\n')
+     
+def main():
+    with open('web_scrapper/player_urls/validate_player_urls/valid_urls.out', 'w') as valid_output:
+        with open('web_scrapper/player_urls/validate_player_urls/error_urls.out', 'w') as error_output:   
 
-def create_dst_encodings_dictionary():
-    with open('dst_encodings.out') as f:
-        data = f.readlines()
-        data = [line.strip() for line in data]
-        data = [line.split(',') for line in data]
-    dst_encodings = {}
-    for line in data:
-        dst_encodings[line[1][1:]] = line[0]
-    return dst_encodings
-
-def create_skill_score():
-    with open('skill_scores.out') as f:
-        data = f.readlines()
-        data = [line.strip() for line in data]
-        data = [line.split(',') for line in data]
-    skill_scores = []
-    skill_score = 0
-    seasons = 0
-    for line in data:
-        if line[0] == '':
-            skill_scores.append(str(round(skill_score / seasons, 2)))
-            skill_score = 0
-            seasons = 0
-        else:     
-            try:
-                skill_score += float(line[1]) / float(line[0])        
-            except ZeroDivisionError:
-                if float(line[0]) != 0 and float(line[1]) != 0: # Error occurs when dividing 0 points scored / 0 games played.
-                    raise ZeroDivisionError
-            seasons += 1      
-    return skill_scores        
-
-def create_player_data(dst_rankings, dst_encodings, skill_scores):
-    with open('weekly_data.out') as f:
-        data = f.readlines()
-        data = [line.strip() for line in data]
-        data = [line.split(',') for line in data]
-
-    player_dst_rankings, player_dst_encodings, player_fantasy_points, player_skill_score  = '', '', '', ''
-    player_weeks_encodings, player_season_encodings = '', ''
-    player_data = []
-    player = 0
-    week = 0
-    year = 0
-    for line in data:  
-        if line[0] == '':             
-            week = 0
-            year += 1
-        if year == 3:
-            player_data.append(f'{player_dst_rankings[:-2]}\n')
-            player_data.append(f'{player_dst_encodings[:-2]}\n')
-            player_data.append(f'{player_fantasy_points[:-2]}\n')
-            player_data.append(f'{player_skill_score[:-2]}\n')
-            player_data.append(f'{player_weeks_encodings[:-2]}\n')
-            player_data.append(f'{player_season_encodings[:-2]}\n')
-            player_dst_rankings, player_dst_encodings, player_fantasy_points, player_skill_score  = '', '', '', ''
-            player_weeks_encodings, player_season_encodings = '', ''
-            player += 1
-            year = 0
-        
-        if line[0][:34] == 'Player does not have any game data':         
-            num_games = 16
-            if year >= 1: # NFL changed schedule to 17 games in 2021
-                num_games = 17                      
-            player_dst_rankings +=  '0, ' * num_games 
-            player_dst_encodings += '0, ' * num_games
-            player_fantasy_points += '0, ' * num_games
-            player_weeks_encodings += '0, ' * num_games
-            player_season_encodings += '0, ' * num_games
-            skill_score = skill_scores[player]
-            player_skill_score += f'{skill_score}, ' * num_games        
-        else:               
-            try: 
-                dst = line[1][1:]
-                dst = dst.replace('@ ', '')
-                dst = dst.replace('vs. ', '')
+            with open('web_scrapper/player_urls/validate_player_urls/player_urls.out', 'r') as player_urls_input_file:
+                player_urls = player_urls_input_file.readlines() 
+            for player in player_urls[:3]:
+                player = player.strip()
+                # Create an output file containing only a single player url.
+                with open('web_scrapper/player_urls/validate_player_urls/validate_player_url.out', 'w') as validate_urls_output:
+                    validate_urls_output.write(player)
+                
+                create_player_outut_files()
+                                                       
+                dst_rankings = create_dst_rankings_dictionary()
+                dst_ids = create_dst_id_dictionary()
+                skill_scores = create_skill_score('web_scrapper/player_urls/validate_player_urls/skill_scores.out')
+                seasons_played = create_seasons_played('web_scrapper/player_urls/validate_player_urls/rookie_seasons.out')
+                team_ids = create_team_ids(dst_ids, 'web_scrapper/player_urls/validate_player_urls/team_id.out')
+                
                 try:
-                    dst_rank = dst_rankings[(year, week, dst)]
-                    dst_encode = dst_encodings[dst]
-                    week += 1
-                    player_weeks_encodings += f'{week}, '
-                    player_season_encodings += f'{year}, '   
-                    fantasy_points = line[17][1:]
-                    skill_score = skill_scores[player]   
-                    if fantasy_points != '-':              
-                        player_dst_rankings += dst_rank + ', '
-                        player_dst_encodings += dst_encode + ', '
-                        player_fantasy_points += fantasy_points + ', '
-                        player_skill_score += skill_score + ', '
-                    else:
-                        player_dst_rankings += '0, '
-                        player_dst_encodings += '0, '
-                        player_fantasy_points += '0, '
-                        player_skill_score += skill_score + ', '                              
-                except KeyError:
-                    pass              
-            except IndexError:
-                pass
-    return player_data
-
-def create_data_txt(player_data):
-    output = open('data.txt', 'w')
-    player_data = [line.split() for line in player_data]     
-    for line in player_data:
-        for item in line:
-            output.write(item + ' ')
-        output.write('\n')
-    output.close() 
-
-
+                    depth_chart =  create_depth_chart(create_roster(team_ids), create_fantasy_points('web_scrapper/player_urls/validate_player_urls/weekly_data.out'),
+                                                      skill_scores)
+                except ValueError:
+                    error_output.write(player + '\n')
+                    continue   
+                
+                try:
+                    player_data = create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played, team_ids, 
+                                                     depth_chart, 17, 'web_scrapper/player_urls/validate_player_urls/weekly_data.out')
+                except ZeroDivisionError:
+                    error_output.write(player + '\n')
+                    continue
+                   
+                create_data_csv(player_data, 
+                                'web_scrapper/player_urls/validate_player_urls/validate_data.csv')
+            
+                validate_player_data(valid_output, error_output, player)
+                
+                    
 if __name__ == '__main__':    
-    with open('valid_urls.out', 'w') as valid_output:
-        with open('error_urls.out', 'w') as error_output:   
-            with open('complete_error_urls.out', 'r') as player_urls: 
-                num_players = 1
-                for player in player_urls:
-                    player = player.strip()
-                    with open('validate_player_urls.out', 'w') as validate_urls_output:
-                        validate_urls_output.write(player)
-                    
-                    create_weekly_data.main('validate_player_urls.out', 'weekly_data.out')
-                    create_skill_scores.main('validate_player_urls.out', 'skill_scores.out')
-                    
-                    try:
-                        player_data = create_player_data(create_dst_rankings_dictionary(), create_dst_encodings_dictionary(),
-                                             create_skill_score())
-                        create_data_txt(player_data)
-                        with open('data.txt', 'r') as data_file:
-                            data = data_file.read()
-                            data = data.split('\n')
-                            if len(data) == 7:
-                                valid_lines = 0
-                                for line in data:
-                                    line = line.split()
-                                    if len(line) == 50:
-                                        valid_lines += 1
-                                if valid_lines == 6:
-                                    valid_output.write(player + '\n')
-                                else:
-                                    error_output.write(player + '\n')
-                    except ZeroDivisionError:
-                        error_output.write(player + '\n')
-                    if num_players == 2:
-                        break
-                    num_players += 1
- 
+    main()
