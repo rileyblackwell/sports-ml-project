@@ -25,7 +25,8 @@ class WeeklyDataParser(HTMLParser):
                 self.output.write(f'{data}\n')
                 self.first_td = False
 
-def main(input_file = '../player_urls/player_urls.out', output_file = 'rookie_seasons_data.out'):
+def main(input_file = 'web_scrapper/player_urls/player_urls.out', 
+         output_file = 'web_scrapper/rookie_seasons/rookie_seasons_data.out'):
     with open(output_file, 'w') as output:
         parser = WeeklyDataParser(output)
         with open(input_file, 'r') as f: 
