@@ -43,7 +43,7 @@ class SKillScoreParser(HTMLParser):
           
             self.start_of_data = True           
 
-def main(input_file = '../player_urls/player_urls.out', output_file = 'skill_scores.out'):
+def main(input_file = 'web_scrapper/player_urls/player_urls.out', output_file = 'web_scrapper/skill_scores/skill_scores.out'):
     with open(output_file, 'w') as output:
         parser = SKillScoreParser(output)
         with open(input_file, 'r') as f:          

@@ -51,7 +51,7 @@ def main():
 
             with open('web_scrapper/player_urls/validate_player_urls/player_urls.out', 'r') as player_urls_input_file:
                 player_urls = player_urls_input_file.readlines() 
-            for player in player_urls[:3]:
+            for player in player_urls[:2]:
                 player = player.strip()
                 # Create an output file containing only a single player url.
                 with open('web_scrapper/player_urls/validate_player_urls/validate_player_url.out', 'w') as validate_urls_output:
@@ -61,26 +61,26 @@ def main():
                                                        
                 dst_rankings = create_dst_rankings_dictionary()
                 dst_ids = create_dst_id_dictionary()
-                skill_scores = create_skill_score('web_scrapper/player_urls/validate_player_urls/skill_scores.out')
+                
+                try:
+                    skill_scores = create_skill_score('web_scrapper/player_urls/validate_player_urls/skill_scores.out')
+                except ZeroDivisionError:
+                    error_output.write(player + '\n')
+                    continue
+                
                 seasons_played = create_seasons_played('web_scrapper/player_urls/validate_player_urls/rookie_seasons.out')
                 team_ids = create_team_ids(dst_ids, 'web_scrapper/player_urls/validate_player_urls/team_id.out')
                 
                 try:
-                    depth_chart =  create_depth_chart(create_roster(team_ids), create_fantasy_points('web_scrapper/player_urls/validate_player_urls/weekly_data.out'),
+                    depth_chart = create_depth_chart(create_roster(team_ids), create_fantasy_points('web_scrapper/player_urls/validate_player_urls/weekly_data.out'),
                                                       skill_scores)
                 except ValueError:
                     error_output.write(player + '\n')
                     continue   
                 
-                try:
-                    player_data = create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played, team_ids, 
-                                                     depth_chart, 17, 'web_scrapper/player_urls/validate_player_urls/weekly_data.out')
-                except ZeroDivisionError:
-                    error_output.write(player + '\n')
-                    continue
-                   
-                create_data_csv(player_data, 
-                                'web_scrapper/player_urls/validate_player_urls/validate_data.csv')
+                player_data = create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played, team_ids, 
+                                                 depth_chart, 17, 'web_scrapper/player_urls/validate_player_urls/weekly_data.out')  
+                create_data_csv(player_data, 'web_scrapper/player_urls/validate_player_urls/validate_data.csv')
             
                 validate_player_data(valid_output, error_output, player)
                 

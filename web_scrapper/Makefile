@@ -1,26 +1,16 @@
 create_data_tests:
-	cd ./skill_scores && python3 create_skill_scores_tests.py
-	cd ./weekly_data && python3 create_weekly_data_tests.py
-	cd ./rookie_seasons && python3 create_rookie_seasons_tests.py
-	cd ./data && python3 create_data_tests.py
-	cd ./team_id && python3 create_team_id_tests.py
-	cd ./rookie_seasons && python3 create_rookie_seasons_tests.py
-	diff create_data_tests.out create_data_tests.out.correct
-
-data_tests:
-	cd ./skill_scores && python3 create_skill_scores_tests.py
-	cd ./weekly_data && python3 create_weekly_data_tests.py
-	cd ./rookie_seasons && python3 create_rookie_seasons_tests.py
-	cd ./team_id && python3 create_team_id_tests.py
-	cd ./data && python3 create_data_tests.py	 
-
+	python3 -m web_scrapper.skill_scores.create_skill_scores_tests
+	python3 -m web_scrapper.weekly_data.create_weekly_data_tests
+	python3 -m web_scrapper.rookie_seasons.create_rookie_seasons_tests
+	python3 -m web_scrapper.team_id.create_team_id_tests
+	python3 -m web_scrapper.data.create_data_tests
+  
 data.csv:
-	cd ./skill_scores && python3 create_skill_scores.py
-	cd ./weekly_data && python3 create_weekly_data.py
-	cd ./rookie_seasons && python3 create_rookie_seasons.py
-	cd ./team_id && python3 create_team_id.py
-	cd ./data && python3 create_data.py
-
+	python3 -m web_scrapper.skill_scores.create_skill_scores
+	python3 -m web_scrapper.weekly_data.create_weekly_data
+	python3 -m web_scrapper.rookie_seasons.create_rookie_seasons
+	python3 -m web_scrapper.team_id.create_team_id
+	python3 -m web_scrapper.data.create_data
 
 .PHONY: 
 

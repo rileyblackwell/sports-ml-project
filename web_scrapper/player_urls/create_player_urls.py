@@ -42,11 +42,13 @@ class PlayerUrlParser(HTMLParser):
                     self.is_player_name = 0    
 
 class ValidPlayerURLParser(HTMLParser):
-    def __init__(self):
+    def __init__(self, player, output):
         super().__init__()     
         self.in_td_tag = False
         self.in_span_tag = False
         self.start_of_data = 0
+        self.output = output
+        self.player = player
          
     def handle_starttag(self, tag, attrs):         
         if tag == 'td':
@@ -60,19 +62,22 @@ class ValidPlayerURLParser(HTMLParser):
         if self.in_td_tag:
             if self.start_of_data == 3:
                 if data[:2] == 'RB':
-                    output.write(f'{player}\n')
+                    self.output.write(f'{self.player}\n')
                 else:
-                    output.write(f'{player}-rb\n')               
+                    self.output.write(f'{self.player}-rb\n')               
             self.start_of_data += 1
 
-if __name__ == '__main__':
+def main(output_file = 'web_scrapper/player_urls/player_urls.out'):
     player_url_parser = PlayerUrlParser()
     player_url_parser.feed(get_web_page('https://www.fantasypros.com/nfl/stats/rb.php'))
     
-    valid_player_url_parser = ValidPlayerURLParser() 
-    with open('player_urls.out', 'w') as output: 
+    with open(output_file, 'w') as output: 
         for player in player_url_parser.players:
+            valid_player_url_parser = ValidPlayerURLParser(player, output)
             if player != 'cordarrelle-patterson' and player != 'latavius-murray': # this player has errors in the html
                 valid_player_url_parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/rankings/{player}.php'))
-                valid_player_url_parser.start_of_data = 0
+                 
+if __name__ == '__main__':
+    main()
+ 
  

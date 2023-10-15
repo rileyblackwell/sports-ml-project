@@ -26,7 +26,7 @@ class PlayerTeamIdParser(HTMLParser):
                 self.teams.append(f"{data}, ") 
             self.counter += 1 
 
-def main(input_filename = '../player_urls/player_urls.out', output_filename = 'team_id.out'):
+def main(input_filename = 'web_scrapper/player_urls/player_urls.out', output_filename = 'web_scrapper/team_id/team_id.out'):
     with open(output_filename, 'w') as output:
         parser = PlayerTeamIdParser()
         with open(input_filename, 'r') as player_urls_input:
