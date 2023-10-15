@@ -12,19 +12,17 @@ data_tests:
 	cd ./weekly_data && python3 create_weekly_data_tests.py
 	cd ./rookie_seasons && python3 create_rookie_seasons_tests.py
 	cd ./team_id && python3 create_team_id_tests.py
-	cd ./rookie_seasons && python3 create_rookie_seasons_tests.py
 	cd ./data && python3 create_data_tests.py	 
 
-data.txt:
+data.csv:
 	cd ./skill_scores && python3 create_skill_scores.py
 	cd ./weekly_data && python3 create_weekly_data.py
 	cd ./rookie_seasons && python3 create_rookie_seasons.py
 	cd ./team_id && python3 create_team_id.py
-	cd ./rookie_seasons && python3 create_rookie_seasons.py
-	cd data && python3 create_data.py
+	cd ./data && python3 create_data.py
+
 
 .PHONY: 
 
-
 clean:
-	cd data && rm *.out *.txt
+	 
