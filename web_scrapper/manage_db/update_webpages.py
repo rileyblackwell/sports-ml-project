@@ -8,7 +8,7 @@ def fetch_and_store_webpages():
     cursor.execute("SELECT player_url FROM player_stats")
     player_urls = cursor.fetchall()
 
-    for season in range(2020, 2023):
+    for season in range(2023, 2024):
         for url in player_urls:
             player_url = url[0]
             webpage_url = f"https://www.fantasypros.com/nfl/games/{player_url}.php?season={season}"
