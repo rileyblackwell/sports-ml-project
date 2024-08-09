@@ -1,8 +1,6 @@
-import requests
+import sqlite3
 from html.parser import HTMLParser
-
-def get_web_page(url):
-    return requests.get(url).content.decode('utf-8')
+import os
 
 class WeeklyDataParser(HTMLParser):
     def __init__(self, output):
@@ -33,6 +31,29 @@ class WeeklyDataParser(HTMLParser):
             self.output.write(f"{data}, ")
             self.start_of_data = True           
 
+def get_player_webpage_from_db(player, season):
+    # Get the current directory
+    current_dir = os.getcwd()
+    
+    # Create the path to the database file
+    db_path = os.path.join(current_dir, 'web_scrapper', 'player_stats.db')
+   
+    # Connect to the database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    # Query to get the player's webpage
+    cursor.execute(f"SELECT webpage_{season} FROM player_stats WHERE player_url='{player}'")
+    result = cursor.fetchone()
+    
+    # Close the connection
+    conn.close()
+    
+    if result:
+        return result[0]
+    else:
+        return None
+
 def main(input_file = 'web_scrapper/player_urls/player_urls.out', output_file = 'web_scrapper/weekly_data/weekly_data.out'):
     with open(output_file, 'w') as output:
         parser = WeeklyDataParser(output)
@@ -40,9 +61,10 @@ def main(input_file = 'web_scrapper/player_urls/player_urls.out', output_file = 
             for player in f:
                 player = player.strip() 
                 for season in range(2020, 2023):                   
-                    parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/games/{player}.php?season={season}'))              
+                    webpage = get_player_webpage_from_db(player, season)
+                    if webpage:
+                        parser.feed(webpage)
         output.write('\n\n') # prevents a bug in create_data.py where player data isn't outputted.               
 
 if __name__ == '__main__':
-    main()        
-  
+    main()
