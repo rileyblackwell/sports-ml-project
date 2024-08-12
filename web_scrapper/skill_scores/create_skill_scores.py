@@ -79,4 +79,3 @@ def main(input_file = 'web_scrapper/player_urls/player_urls.out', output_file = 
 if __name__ == '__main__':
     main()             
        
-          
