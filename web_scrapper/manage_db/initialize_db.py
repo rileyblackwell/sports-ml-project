@@ -12,11 +12,11 @@ def create_database():
 
         # Create the tables
         cursor.executescript('''
-            CREATE TABLE player_urls (
+            CREATE TABLE IF NOT EXISTS player_urls (
                 player_url TEXT PRIMARY KEY
             );
 
-            CREATE TABLE webpage_html (
+            CREATE TABLE IF NOT EXISTS webpage_html (
                 player_url TEXT,
                 webpage_year INTEGER,
                 webpage_html TEXT,
@@ -25,21 +25,28 @@ def create_database():
                 FOREIGN KEY (player_url) REFERENCES player_urls (player_url)
             );
 
-            CREATE TABLE player_weekly_data (
+            CREATE TABLE IF NOT EXISTS player_weekly_data (
                 player_url TEXT PRIMARY KEY,
                 data TEXT,
                 FOREIGN KEY (player_url) REFERENCES player_urls (player_url)
             );
 
-            CREATE TABLE player_skill_scores (
+            CREATE TABLE IF NOT EXISTS player_skill_scores (
                 player_url TEXT PRIMARY KEY,
                 data TEXT,
                 FOREIGN KEY (player_url) REFERENCES player_urls (player_url)
             );
 
-            CREATE TABLE player_rookie_season (
+            CREATE TABLE IF NOT EXISTS player_rookie_season (
                 player_url TEXT PRIMARY KEY,
                 data TEXT,
+                FOREIGN KEY (player_url) REFERENCES player_urls (player_url)
+            );
+
+            CREATE TABLE IF NOT EXISTS player_stats_html (
+                player_url TEXT PRIMARY KEY,
+                stats_html TEXT,
+                date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (player_url) REFERENCES player_urls (player_url)
             );
         ''')
@@ -47,10 +54,10 @@ def create_database():
         # Commit the changes
         conn.commit()
 
-        print("Database created successfully!")
+        print("Database created/updated successfully!")
 
     except sqlite3.Error as e:
-        print(f"Error creating database: {e}")
+        print(f"Error creating/updating database: {e}")
 
     finally:
         # Close the connection

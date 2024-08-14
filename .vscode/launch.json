@@ -8,7 +8,7 @@
             "name": "Python: Module",
             "type": "debugpy",
             "request": "launch",
-            "module": "web_scrapper.skill_scores.create_skill_scores",
+            "module": "web_scrapper.data.create_data",
             "justMyCode": true
         }
     ]

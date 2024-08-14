@@ -1,8 +1,5 @@
-import requests
+import sqlite3
 from html.parser import HTMLParser
-
-def get_web_page(url):
-    return requests.get(url).content.decode('utf-8')
 
 class PlayerTeamIdParser(HTMLParser):
     def __init__(self):
@@ -26,14 +23,33 @@ class PlayerTeamIdParser(HTMLParser):
                 self.teams.append(f"{data}, ") 
             self.counter += 1 
 
-def main(input_filename = 'web_scrapper/player_urls/player_urls.out', output_filename = 'web_scrapper/team_id/team_id.out'):
+def get_player_stats_html_from_db(player):
+    conn = sqlite3.connect("../player_stats.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT stats_html FROM player_stats_html WHERE player_url = ?", (player,))
+    result = cursor.fetchone()
+    
+    conn.close()
+    
+    if result:
+        return result[0]
+    else:
+        return None
+
+def main(input_filename = '../player_urls/player_urls.out', output_filename = '../team_id/team_id.out'):
     with open(output_filename, 'w') as output:
         parser = PlayerTeamIdParser()
         with open(input_filename, 'r') as player_urls_input:
             for player in player_urls_input:
                 player = player.strip()
-                parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/stats/{player}.php'))
-               
+                stats_html = get_player_stats_html_from_db(player)
+                if stats_html:
+                    parser.feed(stats_html)
+                else:
+                    print(f"No stats found for player {player}")
+                    continue
+                
                 teams = parser.teams[:len(parser.teams) // 2]
                 if len(teams) % 2 == 1:
                     teams = parser.teams[:(len(parser.teams) + 2) // 2]

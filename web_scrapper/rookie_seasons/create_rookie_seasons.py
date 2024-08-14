@@ -1,15 +1,13 @@
-import requests
+import sqlite3
 from html.parser import HTMLParser
+import os
 
-def get_web_page(url):
-    return requests.get(url).content.decode('utf-8')
-
-class WeeklyDataParser(HTMLParser):
-    def __init__(self, output):
+class RookieSeasonsParser(HTMLParser):
+    def __init__(self):
         super().__init__()     
         self.in_td_tag = False
         self.first_td = True
-        self.output = output
+        self.data = []
          
     def handle_starttag(self, tag, attrs):         
         if tag == 'td':
@@ -22,19 +20,68 @@ class WeeklyDataParser(HTMLParser):
     def handle_data(self, data):
         if self.in_td_tag:                   
             if self.first_td:
-                self.output.write(f'{data}\n')
+                self.data.append(f'{data}\n')
                 self.first_td = False
 
-def main(input_file = 'web_scrapper/player_urls/player_urls.out', 
-         output_file = 'web_scrapper/rookie_seasons/rookie_seasons_data.out'):
-    with open(output_file, 'w') as output:
-        parser = WeeklyDataParser(output)
-        with open(input_file, 'r') as f: 
-            for player in f:
-                player = player.strip() 
-                parser.feed(get_web_page(f'https://www.fantasypros.com/nfl/stats/{player}.php'))             
-                parser.first_td = True                    
+def get_player_stats_html_from_db(player):
+    # Get the current directory
+    current_dir = os.getcwd()
+    
+    # Create the path to the database file
+    db_path = os.path.join(current_dir, '..', 'player_stats.db')
+   
+    # Connect to the database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    # Query to get the player's stats html
+    cursor.execute("""
+        SELECT stats_html 
+        FROM player_stats_html 
+        WHERE player_url = ?
+    """, (player,))
+    result = cursor.fetchone()
+    
+    # Close the connection
+    conn.close()
+    
+    if result:
+        return result[0]
+    else:
+        return None
+
+def write_player_rookie_seasons_to_db(player, data):
+    # Get the current directory
+    current_dir = os.getcwd()
+    
+    # Create the path to the database file
+    db_path = os.path.join(current_dir, '..', 'player_stats.db')
+   
+    # Connect to the database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    # Insert the player's rookie seasons into the database
+    cursor.execute("""
+        INSERT OR REPLACE INTO player_rookie_season (player_url, data)
+        VALUES (?, ?)
+    """, (player, ''.join(data)))
+    
+    # Commit the changes
+    conn.commit()
+    
+    # Close the connection
+    conn.close()
+
+def main(input_file = '../player_urls/player_urls.out'):
+    with open(input_file, 'r') as f: 
+        for player in f:
+            player = player.strip() 
+            parser = RookieSeasonsParser()
+            stats_html = get_player_stats_html_from_db(player)
+            if stats_html:
+                parser.feed(stats_html)
+            write_player_rookie_seasons_to_db(player, parser.data)
 
 if __name__ == '__main__':
    main()
-                    

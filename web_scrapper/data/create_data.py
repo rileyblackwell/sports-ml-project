@@ -1,6 +1,7 @@
 from web_scrapper.data.create_params import create_dst_rankings_dictionary, create_dst_id_dictionary, create_team_ids 
 from web_scrapper.data.create_params import create_skill_score, create_seasons_played, create_game_average, create_depth_chart
 from web_scrapper.data.create_params import create_fantasy_points, create_roster
+import sqlite3
 
 def initialize_params(num_params):
     """
@@ -53,17 +54,28 @@ def player_missed_season(params, season):
     return new_params
 
 def create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
-                       teams_ids, depth_chart, num_params, filename = 'web_scrapper/weekly_data/weekly_data.out'):
-    with open(filename) as f:
-        data = f.readlines()
-        data = [line.strip() for line in data]
-        data = [line.split(',') for line in data]
+                       teams_ids, depth_chart, num_params):
+    conn = sqlite3.connect("web_scrapper/player_stats.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM player_weekly_data")
+    rows = cursor.fetchall()
     
+    conn.close()
+
+    data = []
+    for row in rows:
+        row_str = row[1].split('\n')
+        data.append([''])
+        for row in row_str:
+            data.append(row.split(','))
+
     params = initialize_params(num_params)
     player_data = []
     player, week, season = 0, 1, 1
-    for line in data:  
-        if line[0] == '':             
+    # Ignore the first blank line. Data for first player starts at data[1]. 
+    for row in data[1:]:  
+        if row[0] == '':             
             week = 1
             season += 1       
             if season == 4:
@@ -75,10 +87,10 @@ def create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
                 season = 1
             continue           
         
-        if line[0][:34] == 'Player does not have any game data':                                          
+        if row[0][:34] == 'Player does not have any game data':                                          
             params = player_missed_season(params, season)     
         else:               
-            dst = line[1][1:].replace('@ ', '').replace('vs. ', '') # Removes @ and vs. from dst name    
+            dst = row[1][1:].replace('@ ', '').replace('vs. ', '') # Removes @ and vs. from dst name    
             try:
                 dst_rank = dst_rankings[(season, week, dst)]
                 dst_id = dst_ids[dst]
@@ -87,8 +99,8 @@ def create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
             
             params[2] += f'{week}, '
             params[1] += f'{season}, '
-            if len(line) == 20: # Handles error with data for joe mixon and devin singletary   
-                fantasy_points = line[17][1:]
+            if len(row) == 20: # Handles error with data for joe mixon and devin singletary   
+                fantasy_points = row[17][1:]
             else:
                 fantasy_points = '-'                    
             params[5] += f'{skill_scores[player]}, '
