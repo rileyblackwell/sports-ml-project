@@ -1,3 +1,5 @@
+import sqlite3
+
 def create_dst_rankings_dictionary():
     """
     Creates a dictionary of DST (Defense/Special Teams) rankings for each season and week.
@@ -170,7 +172,7 @@ def create_game_average(fantasy_points, num_games):
             game_data += '0.0' + ', '
     return game_data
 
-def create_fantasy_points(filename='web_scrapper/weekly_data/weekly_data.out'):
+def create_fantasy_points():
     """
     Creates a list of fantasy points for each player.
 
@@ -180,16 +182,29 @@ def create_fantasy_points(filename='web_scrapper/weekly_data/weekly_data.out'):
     Returns:
         dict: A dictionary with keys as tuples (player_id, season) and values as fantasy points.
     """
-    with open(filename) as f:
-        data = f.readlines()
-        data = [line.strip() for line in data]
-        data = [line.split(',') for line in data]
+    conn = sqlite3.connect("web_scrapper/player_stats.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM player_weekly_data")
+    rows = cursor.fetchall()
+    
+    conn.close()
+
+    data = []
+    for row in rows:
+        row_str = row[1].split('\n')
+        data.append([''])
+        for row in row_str:
+            data.append(row.split(','))
+    data.append([''])
 
     fantasy_points = {}
     player_fantasy_points = []
     season = 1
     player_id = 1
-    for line in data:
+
+    # Ignore the first blank line. Data for first player starts at data[1]. 
+    for line in data[1:]:
         if line[0] == '':
             season += 1
             fantasy_points[(player_id, season - 1)] = player_fantasy_points

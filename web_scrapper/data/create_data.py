@@ -69,6 +69,7 @@ def create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
         data.append([''])
         for row in row_str:
             data.append(row.split(','))
+    data.append([''])
 
     params = initialize_params(num_params)
     player_data = []
