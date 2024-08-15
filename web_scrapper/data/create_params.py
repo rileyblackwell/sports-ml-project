@@ -81,34 +81,39 @@ def create_team_ids(dst_ids, filename='web_scrapper/team_id/team_id.out'):
     return team_ids
 
 
-def create_skill_score(filename='web_scrapper/skill_scores/skill_scores.out'):
+def create_skill_score():
     """
     Creates a list of skill scores.
-
-    Args:
-        filename (str): Path to the file containing skill scores data.
 
     Returns:
         list: A list of skill scores.
     """
-    with open(filename) as f:
-        data = f.readlines()
-        data = [line.strip() for line in data]
-        data = [line.split(',') for line in data]
+    conn = sqlite3.connect("web_scrapper/player_stats.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM player_skill_scores")
+    rows = cursor.fetchall()
+    conn.close()
+    
+    data = []
+    for row in rows:
+        row_str = row[1].split('\n')
+        for row in row_str:
+            data.append(row.split(','))
 
     skill_scores = []
     skill_score, seasons = 0, 0
     for line in data:
-        if line[0] == '':
-            skill_scores.append(str(round(skill_score / seasons, 2)))
-            skill_score, seasons = 0, 0
-        else:
-            try:
-                skill_score += float(line[1]) / float(line[0])
-            except ZeroDivisionError:
-                if float(line[0]) != 0 and float(line[1]) != 0:  # Error occurs when dividing 0 points scored / 0 games played
-                    raise ZeroDivisionError
-            seasons += 1
+     if line[0] == '':
+         skill_scores.append(str(round(skill_score / seasons, 2)))
+         skill_score, seasons = 0, 0
+     else:
+         try:
+             skill_score += float(line[1]) / float(line[0])
+         except ZeroDivisionError:
+             if float(line[0]) != 0 and float(line[1]) != 0:  # Error occurs when dividing 0 points scored / 0 games played
+                 raise ZeroDivisionError
+         seasons += 1
     return skill_scores
 
 
