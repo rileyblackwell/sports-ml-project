@@ -2,9 +2,9 @@ from web_scrapper.skill_scores import create_skill_scores
 from web_scrapper.weekly_data import create_weekly_data
 from web_scrapper.rookie_seasons import create_rookie_seasons
 from web_scrapper.team_id import create_team_id
-from web_scrapper.data.create_data import create_player_data, create_data_csv, create_depth_chart, create_fantasy_points 
-from web_scrapper.data.create_data import create_dst_rankings_dictionary, create_dst_id_dictionary, create_roster 
-from web_scrapper.data.create_data import create_seasons_played, create_skill_score, create_team_ids
+from web_scrapper.data.main import create_player_data, create_data_csv, create_depth_chart, create_fantasy_points 
+from web_scrapper.data.main import create_dst_rankings_dictionary, create_dst_id_dictionary, create_roster 
+from web_scrapper.data.main import create_seasons_played, create_skill_score, create_team_ids
 
 def create_player_outut_files():
     """ Create the output files needed to create the player data for a single player.
