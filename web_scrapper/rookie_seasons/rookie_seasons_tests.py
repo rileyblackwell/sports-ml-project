@@ -1,5 +1,5 @@
 import unittest
-from create_rookie_seasons import main
+from web_scrapper.rookie_seasons.main import main
 
 class TestCreateRookieSeasons(unittest.TestCase):
     def test_main(self):

@@ -1,5 +1,5 @@
 import unittest
-from create_team_id import main
+from web_scrapper.team_id.main import main
 
 class TestCreateTeamId(unittest.TestCase):
     def test_main(self):

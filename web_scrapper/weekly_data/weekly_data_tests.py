@@ -1,5 +1,5 @@
 import unittest
-from create_weekly_data import main
+from web_scrapper.weekly_data.main import main
 
 class TestCreateWeeklyData(unittest.TestCase):
     def test_main(self):

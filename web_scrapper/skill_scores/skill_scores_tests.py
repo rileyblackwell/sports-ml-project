@@ -1,5 +1,5 @@
 import unittest
-from create_skill_scores import main
+from web_scrapper.skill_scores.main import main
 
 class TestCreateSkillScores(unittest.TestCase):
     def test_main(self):
