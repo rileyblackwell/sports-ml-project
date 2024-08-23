@@ -40,12 +40,16 @@ def create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played, team
                 fantasy_points = row[17][1:]
             else:
                 fantasy_points = '-'                    
-            params[5] += f'{skill_scores[player]}, '
+            try:
+                params[5] += f'{skill_scores[player]}, '
+            except IndexError:  
+                params[5] += '0, '
+    
             params[6] += f'{seasons_played[player][season - 1]}, '
             params[7] += f'{player + 1}, '                    
             try:
                 params[15] += f'{teams_ids[player][season]}, '
-            except KeyError:
+            except (KeyError, IndexError) as e:
                 params[15] += '0, ' # Player did not play in the season
             
             if fantasy_points == '-':              

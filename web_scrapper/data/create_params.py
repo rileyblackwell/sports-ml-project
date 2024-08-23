@@ -104,16 +104,21 @@ def create_skill_score():
     skill_scores = []
     skill_score, seasons = 0, 0
     for line in data:
-     if line[0] == '':
-         skill_scores.append(str(round(skill_score / seasons, 2)))
-         skill_score, seasons = 0, 0
-     else:
-         try:
-             skill_score += float(line[1]) / float(line[0])
-         except ZeroDivisionError:
-             if float(line[0]) != 0 and float(line[1]) != 0:  # Error occurs when dividing 0 points scored / 0 games played
-                 raise ZeroDivisionError
-         seasons += 1
+        if line[0] == '':
+            try:
+                skill_scores.append(str(round(skill_score / seasons, 2)))
+            except ZeroDivisionError:
+                skill_scores.append('0.0')
+            skill_score, seasons = 0, 0
+        else:
+            try:
+                skill_score += float(line[1]) / float(line[0])
+            except ValueError:
+                skill_score += 0.0
+            except ZeroDivisionError:
+                if float(line[0]) != 0 and float(line[1]) != 0:  # Error occurs when dividing 0 points scored / 0 games played
+                    raise ZeroDivisionError
+            seasons += 1
     return skill_scores
 
 
@@ -146,7 +151,10 @@ def create_seasons_played():
     for rookie_season in rookie_seasons:
         seasons = []
         for i in range(2, -1, -1):
-            current_season = max(23 - int(rookie_season) - i, 0)
+            try:
+                current_season = max(23 - int(rookie_season) - i, 0)
+            except ValueError:
+                current_season = 0
             seasons.append(str(current_season))
         seasons_played.append(seasons)
     return seasons_played
@@ -165,7 +173,8 @@ def create_game_average(fantasy_points, num_games):
         str: A comma-separated string of game averages.
     """
     games = fantasy_points[:-2].split(', ')
-    games = [float(game) for game in games]
+    games = [0.0 if game == '' else float(game) for game in games]
+
     game_data = ''
     for i in range(len(games)):
         games_played = 0
@@ -424,7 +433,10 @@ def create_depth_chart(rosters, fantasy_points, skill_scores):
             for player_game_averages in team_game_averages.items():
                 game_averages = check_if_player_missed_games(player_game_averages[0], player_game_averages[1][:-2].split(', '), 
                                                              fantasy_points, season_id)
-                game_averages_rankings.append((player_game_averages[0], team_id, float(game_averages[week])))
+                try:
+                    game_averages_rankings.append((player_game_averages[0], team_id, float(game_averages[week])))
+                except IndexError:
+                    game_averages_rankings.append((player_game_averages[0], team_id, 0.0))
             # rank players on the depth chart by highest to lowest 3 game averages    
             game_averages_rankings.sort(key=lambda x: x[2], reverse=True)
             

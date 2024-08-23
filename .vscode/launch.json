@@ -8,8 +8,8 @@
             "name": "Python: Module",
             "type": "debugpy",
             "request": "launch",
-            "module": "web_scrapper.player_urls.intialize_player_urls",
-            "args": ["qb"],
+            "module": "web_scrapper.data.main",
+            "args": [],
             "justMyCode": true
         }
     ]

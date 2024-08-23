@@ -64,8 +64,7 @@ def main(input_filename = '../player_urls/player_urls.out', output_filename = '.
                 elif len(teams) == 4:
                     for team in teams[-6:-4]:
                         output.write(team)
-                else:
-                    raise IndexError('Error: player was never on a team for the last 3 seasons')
+                
                 output.write('\n')
                 parser.counter = 0 # resets the counter for the next player
                 parser.teams.clear() # clears the list for the next player
