@@ -91,16 +91,35 @@ def write_player_skill_scores_to_db(player, data):
     # Close the connection
     conn.close()
 
-def main(input_file = '../player_urls/player_urls.out'):
-    with open(input_file, 'r') as f: 
-        for player in f:
-            player = player.strip() 
-            parser = SKillScoreParser()
-            for season in range(2018, 2023):                   
-                webpage = get_player_webpage_from_db(player, season)
-                if webpage:
-                    parser.feed(webpage)
-            write_player_skill_scores_to_db(player, parser.data)
+def get_player_urls_from_db():
+    # Get the current directory
+    current_dir = os.getcwd()
+    
+    # Create the path to the database file
+    db_path = os.path.join(current_dir, '..', 'player_stats.db')
+   
+    # Connect to the database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    # Query to get all player URLs
+    cursor.execute("SELECT player_url FROM player_urls")
+    results = cursor.fetchall()
+    
+    # Close the connection
+    conn.close()
+    
+    return [result[0] for result in results]
+
+def main():
+    player_urls = get_player_urls_from_db()
+    for player in player_urls:
+        parser = SKillScoreParser()
+        for season in range(2018, 2023):                   
+            webpage = get_player_webpage_from_db(player, season)
+            if webpage:
+                parser.feed(webpage)
+        write_player_skill_scores_to_db(player, parser.data)
 
 if __name__ == '__main__':
     main()

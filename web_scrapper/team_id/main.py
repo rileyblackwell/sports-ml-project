@@ -37,37 +37,52 @@ def get_player_stats_html_from_db(player):
     else:
         return None
 
-def main(input_filename = '../player_urls/player_urls.out', output_filename = '../team_id/team_id.out'):
-    with open(output_filename, 'w') as output:
-        parser = PlayerTeamIdParser()
-        with open(input_filename, 'r') as player_urls_input:
-            for player in player_urls_input:
-                player = player.strip()
-                stats_html = get_player_stats_html_from_db(player)
-                if stats_html:
-                    parser.feed(stats_html)
-                else:
-                    print(f"No stats found for player {player}")
-                    continue
-                
-                teams = parser.teams[:len(parser.teams) // 2]
-                if len(teams) % 2 == 1:
-                    teams = parser.teams[:(len(parser.teams) + 2) // 2]
-              
-                # outputs the team id for the last 3 seasons   
-                if len(teams) >= 8:
-                    for team in teams[-10:-4]: # teams played for 2020, 2021, 2022
-                        output.write(team)
-                elif len(teams) == 6:
-                    for team in teams[-8:-4]:
-                        output.write(team)
-                elif len(teams) == 4:
-                    for team in teams[-6:-4]:
-                        output.write(team)
-                
-                output.write('\n')
-                parser.counter = 0 # resets the counter for the next player
-                parser.teams.clear() # clears the list for the next player
+def write_player_team_id_to_db(player, team_id):
+    conn = sqlite3.connect("../player_stats.db")
+    cursor = conn.cursor()
+
+    cursor.execute("INSERT OR REPLACE INTO player_team_id (player_url, data) VALUES (?, ?)", (player, team_id))
+    conn.commit()
+    
+    conn.close()
+
+def get_player_urls_from_db():
+    conn = sqlite3.connect("../player_stats.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT player_url FROM player_urls")
+    results = cursor.fetchall()
+    
+    conn.close()
+    
+    return [result[0] for result in results]
+
+def main():
+    parser = PlayerTeamIdParser()
+    player_urls = get_player_urls_from_db()
+    for player in player_urls:
+        stats_html = get_player_stats_html_from_db(player)
+        if stats_html:
+            parser.feed(stats_html)
+        else:
+            print(f"No stats found for player {player}")
+            continue
+        
+        teams = parser.teams[:len(parser.teams) // 2]
+        if len(teams) % 2 == 1:
+            teams = parser.teams[:(len(parser.teams) + 2) // 2]
+      
+        # outputs the team id for the last 3 seasons   
+        if len(teams) >= 8:
+            team_id = ''.join(teams[-10:-4]) # teams played for 2020, 2021, 2022
+        elif len(teams) == 6:
+            team_id = ''.join(teams[-8:-4])
+        elif len(teams) == 4:
+            team_id = ''.join(teams[-6:-4])
+        
+        write_player_team_id_to_db(player, team_id)
+        parser.counter = 0 # resets the counter for the next player
+        parser.teams.clear() # clears the list for the next player
     
 if __name__ == '__main__':
     main()

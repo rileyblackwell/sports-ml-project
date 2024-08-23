@@ -49,6 +49,18 @@ def create_database():
                 date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (player_url) REFERENCES player_urls (player_url)
             );
+
+            CREATE TABLE IF NOT EXISTS player_positions (
+                player_url TEXT PRIMARY KEY,
+                data TEXT,
+                FOREIGN KEY (player_url) REFERENCES player_urls (player_url)
+            );
+
+            CREATE TABLE IF NOT EXISTS player_team_id (
+                player_url TEXT PRIMARY KEY,
+                data TEXT,
+                FOREIGN KEY (player_url) REFERENCES player_urls (player_url)
+            );
         ''')
 
         # Commit the changes

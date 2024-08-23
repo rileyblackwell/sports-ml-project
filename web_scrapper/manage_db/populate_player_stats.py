@@ -6,24 +6,31 @@ def populate_player_urls():
         conn = sqlite3.connect("../player_stats.db")
         cursor = conn.cursor()
 
-        # Open the player_urls.out file and read its contents
-        with open("../player_urls/player_urls.out", "r") as f:
-            player_urls = [line.strip() for line in f.readlines()]
+        # Open the player_urls files and read their contents
+        with open("../player_urls/player_urls_rb.out", "r") as f:
+            player_urls_rb = [line.strip() for line in f.readlines()]
+        with open("../player_urls/player_urls_wr.out", "r") as f:
+            player_urls_wr = [line.strip() for line in f.readlines()]
 
         # Insert each player URL into the player_urls table
-        for url in player_urls:
+        # and insert the corresponding position into the position table
+        for url in player_urls_rb:
             cursor.execute("INSERT OR IGNORE INTO player_urls (player_url) VALUES (?)", (url,))
+            cursor.execute("INSERT OR REPLACE INTO position (player_url, data) VALUES (?, 'rb')", (url,))
+        for url in player_urls_wr:
+            cursor.execute("INSERT OR IGNORE INTO player_urls (player_url) VALUES (?)", (url,))
+            cursor.execute("INSERT OR REPLACE INTO position (player_url, data) VALUES (?, 'wr')", (url,))
 
         # Commit the changes
         conn.commit()
 
-        print("Player URLs populated successfully!")
+        print("Player URLs and positions populated successfully!")
 
     except sqlite3.Error as e:
-        print(f"Error populating player URLs: {e}")
+        print(f"Error populating player URLs and positions: {e}")
 
     except FileNotFoundError:
-        print("Error: player_urls.out file not found")
+        print("Error: one or both of the player_urls files not found")
 
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
