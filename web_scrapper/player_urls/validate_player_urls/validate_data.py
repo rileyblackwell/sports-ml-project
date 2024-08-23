@@ -1,7 +1,9 @@
-from web_scrapper.skill_scores import main as create_skill_scores
-from web_scrapper.weekly_data import main as create_weekly_data
-from web_scrapper.rookie_seasons import main as create_rookie_seasons
-from web_scrapper.team_id import main as create_team_id
+# !!! This file is not complete. It is a work in progress. !!!
+
+from web_scrapper.skill_scores.main import main as skill_scores_main
+from web_scrapper.weekly_data.main import main as weekly_data_main
+from web_scrapper.rookie_seasons.main import main as rookie_seasons_main
+from web_scrapper.team_id.main import main as team_id_main
 from web_scrapper.data.main import create_player_data, create_data_csv, create_depth_chart, create_fantasy_points 
 from web_scrapper.data.main import create_dst_rankings_dictionary, create_dst_id_dictionary, create_roster 
 from web_scrapper.data.main import create_seasons_played, create_skill_score, create_team_ids
@@ -9,16 +11,16 @@ from web_scrapper.data.main import create_seasons_played, create_skill_score, cr
 def create_player_outut_files():
     """ Create the output files needed to create the player data for a single player.
     """
-    create_skill_scores.main('web_scrapper/player_urls/validate_player_urls/validate_player_url.out', 
+    skill_scores_main('web_scrapper/player_urls/validate_player_urls/validate_player_url.out', 
                              'web_scrapper/player_urls/validate_player_urls/skill_scores.out')
     
-    create_weekly_data.main('web_scrapper/player_urls/validate_player_urls/validate_player_url.out', 
+    weekly_data_main('web_scrapper/player_urls/validate_player_urls/validate_player_url.out', 
                             'web_scrapper/player_urls/validate_player_urls/weekly_data.out')
     
-    create_rookie_seasons.main('web_scrapper/player_urls/validate_player_urls/validate_player_url.out', 
+    rookie_seasons_main('web_scrapper/player_urls/validate_player_urls/validate_player_url.out', 
                                'web_scrapper/player_urls/validate_player_urls/rookie_seasons.out')
     
-    create_team_id.main('web_scrapper/player_urls/validate_player_urls/validate_player_url.out',
+    team_id_main('web_scrapper/player_urls/validate_player_urls/validate_player_url.out',
                         'web_scrapper/player_urls/validate_player_urls/team_id.out')
 
 def validate_player_data(valid_output, error_output, player):
@@ -51,7 +53,7 @@ def main():
 
             with open('web_scrapper/player_urls/validate_player_urls/player_urls.out', 'r') as player_urls_input_file:
                 player_urls = player_urls_input_file.readlines() 
-            for player in player_urls[:2]:
+            for player in player_urls[:5]:
                 player = player.strip()
                 # Create an output file containing only a single player url.
                 with open('web_scrapper/player_urls/validate_player_urls/validate_player_url.out', 'w') as validate_urls_output:
