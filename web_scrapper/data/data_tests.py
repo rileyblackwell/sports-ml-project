@@ -14,7 +14,7 @@ class TestCreateData(unittest.TestCase):
                                          create_skill_score('web_scrapper/skill_scores/skill_scores_tests.out'))
         player_data = create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played,
                                          team_ids, depth_chart, 17, 'web_scrapper/weekly_data/weekly_data_tests.out')
-        create_data_csv(player_data, 'web_scrapper/data/create_data_tests.csv')
+        create_data_csv(player_data, 'web_scrapper/data/data_tests.csv')
 
     def test_create_team_ids(self):
         teams_ids = create_team_ids(create_dst_id_dictionary(), 'web_scrapper/team_id/team_id_tests.out')     

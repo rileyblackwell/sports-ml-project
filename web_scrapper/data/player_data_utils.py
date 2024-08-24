@@ -1,3 +1,5 @@
+import random
+
 def initialize_params(num_params):
     """
     Initializes a list of parameters with empty strings.
@@ -66,3 +68,9 @@ def process_player_data(rows):
             data.append(row.split(','))
     data.append([''])
     return data
+
+def shuffle_player_urls(player_urls):
+    """Shuffles the player urls to randomize the order of the players."""
+    for _ in range(500):
+        random.shuffle(player_urls)
+    return player_urls
