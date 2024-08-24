@@ -8,7 +8,7 @@
             "name": "Python: Module",
             "type": "debugpy",
             "request": "launch",
-            "module": "web_scrapper.data.main",
+            "module": "fantasy_football.shrink_data",
             "args": [],
             "justMyCode": true
         }

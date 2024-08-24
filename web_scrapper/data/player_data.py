@@ -3,6 +3,7 @@ from web_scrapper.data.create_params import create_game_average
 from web_scrapper.data.database import (
     read_player_urls_from_db,
     read_player_weekly_data_from_db,
+    read_player_position_from_db,
 )
 from web_scrapper.data.player_data_utils import (
     initialize_params,
@@ -20,7 +21,8 @@ def initialize_player_data(num_params):
     player_data = []
     return player_urls, params, player_data
 
-def process_player_season_data(data, player, season, params, dst_rankings, dst_ids, skill_scores, seasons_played, teams_ids, depth_chart):
+def process_player_season_data(data, player, season, params, dst_rankings, dst_ids, 
+                               skill_scores, seasons_played, teams_ids, depth_chart, position):
     week = 1
     for row in data[1:]:
         if row[0] == '':
@@ -41,11 +43,13 @@ def process_player_season_data(data, player, season, params, dst_rankings, dst_i
             except KeyError:
                 continue
 
-            params = update_params(params, row, week, season, player, dst_rank, dst_id, skill_scores, seasons_played, teams_ids, depth_chart)
+            params = update_params(params, row, week, season, player, dst_rank, dst_id, 
+                                   skill_scores, seasons_played, teams_ids, depth_chart, position)
             week += 1
     return params
 
-def update_params(params, row, week, season, player, dst_rank, dst_id, skill_scores, seasons_played, teams_ids, depth_chart):
+def update_params(params, row, week, season, player, dst_rank, dst_id, 
+                  skill_scores, seasons_played, teams_ids, depth_chart, position):
     params[2] += f'{week}, '
     params[1] += f'{season}, '
     fantasy_points = get_fantasy_points(row)
@@ -53,7 +57,8 @@ def update_params(params, row, week, season, player, dst_rank, dst_id, skill_sco
     params[6] += f'{get_seasons_played(seasons_played, player, season)}, '
     params[7] += f'{player + 1}, '
     params[15] += f'{get_team_id(teams_ids, player, season)}, '
-
+    params[17] += f'{position}, '
+    
     if fantasy_points == '-':
         params = handle_missing_fantasy_points(params)
     else:
@@ -103,14 +108,30 @@ def handle_missing_fantasy_points(params):
         params[i] += '0, '
     return params
 
-def create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played, teams_ids, depth_chart, num_params):
+def get_player_position(player_url):
+    position = read_player_position_from_db(player_url)
+    if position == 'rb':
+        return 1.0
+    elif position == 'wr':
+        return 2.0
+    elif position == 'te':
+        return 3.0
+    elif position == 'qb':
+        return 4.0
+    else:
+        return 0.0
+
+def create_player_data(dst_rankings, dst_ids, skill_scores, 
+                       seasons_played, teams_ids, depth_chart, num_params):
     player_urls, params, player_data = initialize_player_data(num_params)
     player = 0
     season = 1
     for player_url in player_urls:
         rows = read_player_weekly_data_from_db(player_url[0])
         data = process_player_data(rows)
-        params = process_player_season_data(data, player, season, params, dst_rankings, dst_ids, skill_scores, seasons_played, teams_ids, depth_chart)
+        params = process_player_season_data(data, player, season, params, dst_rankings, 
+                                            dst_ids, skill_scores, seasons_played, 
+                                            teams_ids, depth_chart, get_player_position(player_url[0]))
         player_data = add_player_data(player_data, params)
         params = initialize_params(num_params)
         player += 1

@@ -19,5 +19,5 @@ if __name__ == '__main__':
     team_ids = create_team_ids(dst_ids)
     depth_chart = create_depth_chart(create_roster(team_ids), create_fantasy_points(), skill_scores)
 
-    player_data = create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played, team_ids, depth_chart, 17)
+    player_data = create_player_data(dst_rankings, dst_ids, skill_scores, seasons_played, team_ids, depth_chart, 18)
     create_data_csv(player_data)

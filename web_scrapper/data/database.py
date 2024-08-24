@@ -25,3 +25,17 @@ def read_player_weekly_data_from_db(player_url):
     except sqlite3.Error as e:
         print(f"Error reading from database: {e}")
         return []   
+    
+def read_player_position_from_db(player_url):
+    conn = sqlite3.connect("web_scrapper/player_stats.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT data FROM player_positions WHERE player_url = ?", (player_url,))
+    result = cursor.fetchone()
+
+    conn.close()
+
+    if result:
+        return result[0]
+    else:
+        return None
