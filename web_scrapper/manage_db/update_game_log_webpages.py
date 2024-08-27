@@ -1,11 +1,15 @@
 import sqlite3
 import requests
+import sys
 
-def fetch_and_store_webpages():
+def fetch_and_store_webpages(position=None):
     conn = sqlite3.connect("../player_stats.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT player_url FROM player_urls")
+    if position:
+        cursor.execute("SELECT player_url FROM player_positions WHERE data = ?", (position,))
+    else:
+        cursor.execute("SELECT player_url FROM player_positions")
     player_urls = cursor.fetchall()
 
     for season in range(2018, 2024):
@@ -35,4 +39,15 @@ def fetch_and_store_webpages():
     conn.close()
 
 if __name__ == '__main__':
-    fetch_and_store_webpages()
+    if len(sys.argv) != 2:
+        print("Usage: python script_name.py <position>")
+        sys.exit(1)
+
+    position = sys.argv[1].lower()
+    if position == 'all':
+        fetch_and_store_webpages()
+    elif position in ['wr', 'rb', 'te']:
+        fetch_and_store_webpages(position)
+    else:
+        print("Invalid position. Must be one of: wr, rb, te, all")
+        sys.exit(1)

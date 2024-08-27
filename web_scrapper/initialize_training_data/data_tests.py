@@ -1,7 +1,7 @@
 import unittest
-from web_scrapper.data.create_params import create_dst_rankings_dictionary, create_dst_id_dictionary, create_skill_score
-from web_scrapper.data.create_params import create_seasons_played, create_team_ids, create_fantasy_points, create_roster, create_depth_chart
-from web_scrapper.data.main import create_player_data, create_data_csv
+from web_scrapper.initialize_training_data.create_params import create_dst_rankings_dictionary, create_dst_id_dictionary, create_skill_score
+from web_scrapper.initialize_training_data.create_params import create_seasons_played, create_team_ids, create_fantasy_points, create_roster, create_depth_chart
+from web_scrapper.initialize_training_data.main import create_player_data, create_data_csv
 
 class TestCreateData(unittest.TestCase):
     def test_create_player_data(self):

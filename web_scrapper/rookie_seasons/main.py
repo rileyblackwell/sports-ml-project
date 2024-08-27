@@ -1,6 +1,7 @@
 import sqlite3
 from html.parser import HTMLParser
 import os
+import sys
 
 class RookieSeasonsParser(HTMLParser):
     def __init__(self):
@@ -73,7 +74,7 @@ def write_player_rookie_seasons_to_db(player, data):
     # Close the connection
     conn.close()
 
-def get_player_urls_from_db():
+def get_player_urls_from_db(position=None):
     # Get the current directory
     current_dir = os.getcwd()
     
@@ -84,8 +85,10 @@ def get_player_urls_from_db():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    # Query to get all player URLs
-    cursor.execute("SELECT player_url FROM player_urls")
+    if position:
+        cursor.execute("SELECT player_url FROM player_positions WHERE data = ?", (position,))
+    else:
+        cursor.execute("SELECT player_url FROM player_positions")
     results = cursor.fetchall()
     
     # Close the connection
@@ -94,7 +97,19 @@ def get_player_urls_from_db():
     return [result[0] for result in results]
 
 def main():
-    player_urls = get_player_urls_from_db()
+    if len(sys.argv) != 2:
+        print("Usage: python script_name.py <position>")
+        sys.exit(1)
+
+    position = sys.argv[1].lower()
+    if position == 'all':
+        player_urls = get_player_urls_from_db()
+    elif position in ['wr', 'rb', 'te']:
+        player_urls = get_player_urls_from_db(position)
+    else:
+        print("Invalid position. Must be one of: wr, rb, te, all")
+        sys.exit(1)
+
     for player in player_urls:
         parser = RookieSeasonsParser()
         stats_html = get_player_stats_html_from_db(player)

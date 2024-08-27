@@ -1,6 +1,6 @@
-from web_scrapper.data.player_data import create_player_data
-from web_scrapper.data.data_output import create_data_csv
-from web_scrapper.data.create_params import (
+from web_scrapper.initialize_training_data.player_data import create_player_data
+from web_scrapper.initialize_training_data.data_output import create_data_csv
+from web_scrapper.initialize_training_data.create_params import (
     create_dst_rankings_dictionary,
     create_dst_id_dictionary,
     create_team_ids,

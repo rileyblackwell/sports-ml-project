@@ -23,7 +23,7 @@ class PlayerTeamIdRBParser(HTMLParser):
                 self.teams.append(f"{data}, ") 
             self.counter += 1 
 
-class PlayerTeamIdWRParser(HTMLParser):
+class PlayerTeamIdWRTEParser(HTMLParser):
     def __init__(self):
         super().__init__()     
         self.in_td_tag = False
@@ -107,10 +107,10 @@ def main():
         parser.counter = 0 # resets the counter for the next player
         parser.teams.clear() # clears the list for the next player
 
-    # Process WR players
-    parser = PlayerTeamIdWRParser()
-    wr_player_urls = get_player_urls_from_db("wr")
-    for player in wr_player_urls:
+    # Process WR and TE players
+    parser = PlayerTeamIdWRTEParser()
+    wr_te_player_urls = get_player_urls_from_db("wr") + get_player_urls_from_db("te")
+    for player in wr_te_player_urls:
         stats_html = get_player_stats_html_from_db(player)
         if stats_html:
             parser.feed(stats_html)

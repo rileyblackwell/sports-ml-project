@@ -1,11 +1,11 @@
-from web_scrapper.data.create_params import create_game_average
+from web_scrapper.initialize_training_data.create_params import create_game_average
 
-from web_scrapper.data.database import (
+from web_scrapper.initialize_training_data.database import (
     read_player_urls_from_db,
     read_player_weekly_data_from_db,
     read_player_position_from_db,
 )
-from web_scrapper.data.player_data_utils import (
+from web_scrapper.initialize_training_data.player_data_utils import (
     initialize_params,
     add_player_data,
     player_missed_season,
@@ -123,6 +123,7 @@ def get_player_position(player_url):
 
 def create_player_data(dst_rankings, dst_ids, skill_scores, 
                        seasons_played, teams_ids, depth_chart, num_params):
+    
     player_urls, params, player_data = initialize_player_data(num_params)
     player = 0
     season = 1

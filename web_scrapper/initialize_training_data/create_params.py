@@ -43,22 +43,34 @@ def create_dst_id_dictionary():
     return dst_ids
 
 
-def create_team_ids(dst_ids, filename='web_scrapper/team_id/team_id.out'):
+def create_team_ids(dst_ids):
     """
     Creates a list of dictionaries containing team IDs for each season.
 
     Args:
         dst_ids (dict): Dictionary of DST IDs.
-        filename (str): Path to the file containing team IDs data.
 
     Returns:
         list: A list of dictionaries, each containing season-wise team IDs.
     """
     dst_ids['ALL'] = '33'  # ID if player played for multiple teams in a season
-    with open(filename) as f:
-        data = f.readlines()
-        data = [line.strip() for line in data]
-        data = [line.split(',') for line in data]
+
+    conn = sqlite3.connect("web_scrapper/player_stats.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM player_team_id")
+    rows = cursor.fetchall()
+
+    data = []
+    for row in rows:
+        row_str = row[1].split('\n')
+        for row in row_str:
+            data.append(row.split(','))
+
+    # Replace empty spaces with empty strings in the data list
+    data = [[val if val != ' ' else '' for val in row] for row in data]
+    
+    conn.close()
 
     team_ids = []
     for line in data:
