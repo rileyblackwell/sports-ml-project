@@ -78,11 +78,11 @@ def create_team_ids(dst_ids):
         teams = {}
         while j < len(line):
             season = -1
-            if line[i].strip() == '2020':
+            if line[i].strip() == '2021':
                 season = 1
-            elif line[i].strip() == '2021':
-                season = 2
             elif line[i].strip() == '2022':
+                season = 2
+            elif line[i].strip() == '2023':
                 season = 3
 
             if season != -1:
@@ -164,7 +164,7 @@ def create_seasons_played():
         seasons = []
         for i in range(2, -1, -1):
             try:
-                current_season = max(23 - int(rookie_season) - i, 0)
+                current_season = max(24 - int(rookie_season) - i, 0) # current_season - rookie_season - (2, 1, 0) = seasons played
             except ValueError:
                 current_season = 0
             seasons.append(str(current_season))
@@ -246,7 +246,7 @@ def create_fantasy_points():
         
         if line[0][:34] == 'Player does not have any game data':         
             num_games = 16
-            if season >= 2: # NFL changed schedule to 17 games in 2021
+            if season >= 1: # NFL changed schedule to 17 games in 2021
                 num_games = 17
             for _  in range(num_games):
                 player_fantasy_points.append('0.0')
