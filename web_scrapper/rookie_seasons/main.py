@@ -104,10 +104,10 @@ def main():
     position = sys.argv[1].lower()
     if position == 'all':
         player_urls = get_player_urls_from_db()
-    elif position in ['wr', 'rb', 'te']:
+    elif position in ['wr', 'rb', 'te', 'qb']:
         player_urls = get_player_urls_from_db(position)
     else:
-        print("Invalid position. Must be one of: wr, rb, te, all")
+        print("Invalid position. Must be one of: wr, rb, te, qb, all")
         sys.exit(1)
 
     for player in player_urls:

@@ -76,6 +76,8 @@ def update_game_averages(params):
 def get_fantasy_points(row):
     if len(row) == 20:
         return row[17][1:]
+    elif len(row) == 23: # qb has 3 more columns
+        return row[20][1:]
     else:
         return '-'
 

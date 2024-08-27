@@ -33,7 +33,7 @@ def fetch_and_store_player_stats_html(position=None):
             response.raise_for_status()  # Raise an exception for 4xx or 5xx status codes
             webpage = response.text
     
-            cursor.execute("INSERT OR REPLACE INTO player_stats_html (player_url, stats_html) VALUES (?, ?)", (player_url, webpage))
+            cursor.execute("INSERT OR REPLACE INTO player_stats_html (player_url, stats_html, date_created) VALUES (?, ?, CURRENT_TIMESTAMP)", (player_url, webpage))
             conn.commit()
             print(f"Player stats HTML webpage fetched and stored for {player_url}")
     
@@ -50,8 +50,8 @@ if __name__ == '__main__':
     position = sys.argv[1].lower()
     if position == 'all':
         fetch_and_store_player_stats_html()
-    elif position in ['wr', 'rb', 'te']:
+    elif position in ['wr', 'rb', 'te', 'qb']:
         fetch_and_store_player_stats_html(position)
     else:
-        print("Invalid position. Must be one of: wr, rb, te, all")
+        print("Invalid position. Must be one of: wr, rb, te, qb, all")
         sys.exit(1)

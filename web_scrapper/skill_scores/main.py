@@ -42,6 +42,45 @@ class SKillScoreParser(HTMLParser):
           
             self.start_of_data = True           
 
+class SKillScoreQBParser(HTMLParser):
+    def __init__(self):
+        super().__init__()     
+        self.in_td_tag = False
+        self.in_span_tag = False
+        self.start_of_data = False
+        self.totals_row = float('inf')
+        self.games_played = 0
+        self.weeks_row = float('inf')
+        self.data = []
+         
+    def handle_starttag(self, tag, attrs):         
+        if tag == 'td':
+            self.in_td_tag = True
+         
+    def handle_endtag(self, tag):
+        if tag == 'td':
+            self.in_td_tag = False    
+
+    def handle_data(self, data):
+        if self.in_td_tag:              
+            if self.start_of_data:               
+                if data[:4] == 'Week':
+                    self.weeks_row = 0
+                self.weeks_row += 1                         
+                if self.weeks_row == 17:
+                    if data != '-':
+                        self.games_played += 1
+                              
+                if data == 'Totals':
+                    self.totals_row = 0
+                    self.data.append(f'{self.games_played}, ')
+                    self.games_played = 0                        
+                self.totals_row += 1  
+                if self.totals_row == 19:                       
+                    self.data.append(f"{data}\n")
+          
+            self.start_of_data = True           
+
 def get_player_webpage_from_db(player, season):
     # Get the current directory
     current_dir = os.getcwd()
@@ -122,14 +161,17 @@ def main():
     position = sys.argv[1].lower()
     if position == 'all':
         player_urls = get_player_urls_from_db()
-    elif position in ['wr', 'rb', 'te']:
+    elif position in ['wr', 'rb', 'te', 'qb']:
         player_urls = get_player_urls_from_db(position)
     else:
-        print("Invalid position. Must be one of: wr, rb, te, all")
+        print("Invalid position. Must be one of: wr, rb, te, qb, all")
         sys.exit(1)
 
     for player in player_urls:
-        parser = SKillScoreParser()
+        if position == 'qb':
+            parser = SKillScoreQBParser()
+        else:
+            parser = SKillScoreParser()
         for season in range(2019, 2024):                   
             webpage = get_player_webpage_from_db(player, season)
             if webpage:

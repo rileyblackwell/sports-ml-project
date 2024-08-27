@@ -46,8 +46,8 @@ if __name__ == '__main__':
     position = sys.argv[1].lower()
     if position == 'all':
         fetch_and_store_webpages()
-    elif position in ['wr', 'rb', 'te']:
+    elif position in ['wr', 'rb', 'te', 'qb']:
         fetch_and_store_webpages(position)
     else:
-        print("Invalid position. Must be one of: wr, rb, te, all")
+        print("Invalid position. Must be one of: wr, rb, te, qb, all")
         sys.exit(1)

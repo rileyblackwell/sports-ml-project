@@ -7,24 +7,18 @@ def populate_player_urls():
         cursor = conn.cursor()
 
         # Open the player_urls files and read their contents
-        with open("../player_urls/player_urls_rb.out", "r") as f:
-            player_urls_rb = [line.strip() for line in f.readlines()]
-        with open("../player_urls/player_urls_wr.out", "r") as f:
-            player_urls_wr = [line.strip() for line in f.readlines()]
-        with open("../player_urls/player_urls_te.out", "r") as f:
-            player_urls_te = [line.strip() for line in f.readlines()]
+        positions = ['rb', 'wr', 'te', 'qb']
+        player_urls = {}
+        for position in positions:
+            with open(f"../player_urls/player_urls_{position}.out", "r") as f:
+                player_urls[position] = [line.strip() for line in f.readlines()]
 
         # Insert each player URL into the player_urls table
         # and insert the corresponding position into the player_positions table
-        for url in player_urls_rb:
-            cursor.execute("INSERT OR IGNORE INTO player_urls (player_url) VALUES (?)", (url,))
-            cursor.execute("INSERT OR REPLACE INTO player_positions (player_url, data) VALUES (?, 'rb')", (url,))
-        for url in player_urls_wr:
-            cursor.execute("INSERT OR IGNORE INTO player_urls (player_url) VALUES (?)", (url,))
-            cursor.execute("INSERT OR REPLACE INTO player_positions (player_url, data) VALUES (?, 'wr')", (url,))
-        for url in player_urls_te:
-            cursor.execute("INSERT OR IGNORE INTO player_urls (player_url) VALUES (?)", (url,))
-            cursor.execute("INSERT OR REPLACE INTO player_positions (player_url, data) VALUES (?, 'te')", (url,))
+        for position, urls in player_urls.items():
+            for url in urls:
+                cursor.execute("INSERT OR IGNORE INTO player_urls (player_url) VALUES (?)", (url,))
+                cursor.execute("INSERT OR IGNORE INTO player_positions (player_url, data) VALUES (?, ?)", (url, position))
 
         # Commit the changes
         conn.commit()
