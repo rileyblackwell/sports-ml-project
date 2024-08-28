@@ -120,7 +120,7 @@ def main():
 
     for player in player_urls:
         parser = GamelogsParser()
-        for season in range(2020, 2023):                   
+        for season in range(2021, 2024):                   
             webpage = get_player_webpage_from_db(player, season)
             if webpage:
                 parser.feed(webpage)

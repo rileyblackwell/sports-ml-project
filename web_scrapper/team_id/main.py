@@ -68,7 +68,7 @@ class PlayerTeamIdQBParser(HTMLParser):
             self.counter += 1
              
 def get_player_stats_html_from_db(player):
-    conn = sqlite3.connect("web_scrapper/player_stats.db")
+    conn = sqlite3.connect("../player_stats.db")
     cursor = conn.cursor()
 
     cursor.execute("SELECT stats_html FROM player_stats_html WHERE player_url = ?", (player,))
@@ -82,7 +82,7 @@ def get_player_stats_html_from_db(player):
         return None
 
 def write_player_team_id_to_db(player, team_id):
-    conn = sqlite3.connect("web_scrapper/player_stats.db")
+    conn = sqlite3.connect("../player_stats.db")
     cursor = conn.cursor()
 
     cursor.execute("INSERT OR REPLACE INTO player_team_id (player_url, data) VALUES (?, ?)", (player, team_id))
@@ -91,7 +91,7 @@ def write_player_team_id_to_db(player, team_id):
     conn.close()
 
 def get_player_urls_from_db(position):
-    conn = sqlite3.connect("web_scrapper/player_stats.db")
+    conn = sqlite3.connect("../player_stats.db")
     cursor = conn.cursor()
 
     cursor.execute("SELECT player_url FROM player_positions WHERE data = ?", (position,))

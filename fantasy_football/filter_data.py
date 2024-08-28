@@ -6,8 +6,8 @@ def group_player_data(file_name):
         data = list(reader)
     
     player_data = []
-    for i in range(0, len(data), 18):
-        player_data.append(data[i:i+18])
+    for i in range(0, len(data), 17):
+        player_data.append(data[i:i+17])
     
     return player_data
 

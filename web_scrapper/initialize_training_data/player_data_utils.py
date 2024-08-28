@@ -30,7 +30,7 @@ def add_player_data(player_data, params):
         player_data.append(f'{param[:-2]}\n')
     return player_data
 
-def player_missed_season(params, season):
+def player_missed_season(params):
     """
     Updates the parameters for a player to indicate missed games in a season.
 
@@ -41,9 +41,7 @@ def player_missed_season(params, season):
     Returns:
         list: The updated list of player parameters with missed games marked.
     """
-    num_games = 16
-    if season >= 2: # NFL changed schedule to 17 games in 2021
-        num_games = 17 
+    num_games = 17 
     new_params = []
     for param in params:
         param += '0, ' * num_games

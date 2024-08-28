@@ -99,38 +99,36 @@ def create_seasons_played(player_urls):
     Creates a list of number of seasons played for each player.
 
     Args:
-        filename (str): Path to the file containing rookie seasons data.
+        player_urls (list): List of player URLs.
 
     Returns:
         list: A list of number of seasons played for each player.
     """
-    def create_rookie_season():
+    seasons_played = []
+    for player_url in player_urls:
         conn = sqlite3.connect("web_scrapper/player_stats.db")
         cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM player_rookie_season")
-        rows = cursor.fetchall()
+        cursor.execute("SELECT data FROM player_rookie_season WHERE player_url = ?", player_url)
+        result = cursor.fetchone()
 
-        rookie_seasons = []
-        for row in rows:
-            rookie_seasons.append(row[1][2:4])
+        if result:
+            rookie_season = result[0][2:4]
+            seasons = []
+            for i in range(2, -1, -1):
+                try:
+                    current_season = max(24 - int(rookie_season) - i, 0) # current_season - rookie_season - (2, 1, 0) = seasons played
+                except ValueError:
+                    current_season = 0
+                seasons.append(str(current_season))
+            seasons_played.append(seasons)
+        else:
+            seasons_played.append(['0', '0', '0']) # default to 0 seasons played if no data is found
 
         conn.close()
-        return rookie_seasons
 
-    rookie_seasons = create_rookie_season()
-    seasons_played = []
-    for rookie_season in rookie_seasons:
-        seasons = []
-        for i in range(2, -1, -1):
-            try:
-                current_season = max(24 - int(rookie_season) - i, 0) # current_season - rookie_season - (2, 1, 0) = seasons played
-            except ValueError:
-                current_season = 0
-            seasons.append(str(current_season))
-        seasons_played.append(seasons)
     return seasons_played
- 
+
 
 # NOTE: Game average will also include games from the previous season
 def create_game_average(fantasy_points, num_games):
@@ -205,9 +203,7 @@ def create_fantasy_points():
                 player_id += 1
         
         if line[0][:34] == 'Player does not have any game data':         
-            num_games = 16
-            if season >= 1: # NFL changed schedule to 17 games in 2021
-                num_games = 17
+            num_games = 17
             for _  in range(num_games):
                 player_fantasy_points.append('0.0')
         else: 

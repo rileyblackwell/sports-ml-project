@@ -32,5 +32,5 @@ def fetch_player_skill_score(player):
             conn.close()
 
 if __name__ == '__main__':
-    player = "rhamondre-stevenson"
+    player = "joe-burrow"
     fetch_player_skill_score(player)

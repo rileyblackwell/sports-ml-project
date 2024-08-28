@@ -5,7 +5,7 @@ def filter_rows(filename):
     with open(filename, "r") as input_file:
         reader = csv.reader(input_file)
         for row in reader:
-            if len(row) == 50:
+            if len(row) == 51:
                 rows.append(row)
     return rows
 
@@ -19,9 +19,9 @@ def check_errors(filename, print_individual_errors=False):
     with open(filename, "r") as csvfile:
         reader = csv.reader(csvfile)
         for i, row in enumerate(reader):
-            if len(row) != 50:
+            if len(row) != 51:
                 if print_individual_errors:
-                    print(f"Line {i+1}: {len(row)} columns (expected 50)")
+                    print(f"Line {i+1}: {len(row)} columns (expected 51)")
                 error_count += 1
     print(f"Total lines with errors: {error_count}")
 

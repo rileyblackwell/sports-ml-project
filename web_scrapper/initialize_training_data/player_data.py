@@ -1,7 +1,6 @@
 from web_scrapper.initialize_training_data.initialize_params import create_game_average
 
 from web_scrapper.initialize_training_data.database import (
-    read_player_urls_from_db,
     read_player_weekly_data_from_db,
     read_player_position_from_db,
 )
@@ -17,13 +16,13 @@ def write_player_urls_to_file(player_urls):
         for player_url in player_urls:
             f.write(player_url[0] + '\n')
 
-def initialize_player_data(num_params, player_urls):
+def initialize_player_data(num_params):
     params = initialize_params(num_params)
     player_data = []
     return params, player_data
 
 def process_player_season_data(data, player, season, params, dst_rankings, dst_ids, 
-                               skill_scores, seasons_played, teams_ids, depth_chart, position):
+                               skill_scores, seasons_played, teams_ids, position):
     week = 1
     for row in data[1:]:
         if row[0] == '':
@@ -35,7 +34,7 @@ def process_player_season_data(data, player, season, params, dst_rankings, dst_i
             continue
 
         if row[0][:34] == 'Player does not have any game data':
-            params = player_missed_season(params, season)
+            params = player_missed_season(params)
         else:
             dst = row[1][1:].replace('@ ', '').replace('vs. ', '')
             try:
@@ -45,12 +44,12 @@ def process_player_season_data(data, player, season, params, dst_rankings, dst_i
                 continue
 
             params = update_params(params, row, week, season, player, dst_rank, dst_id, 
-                                   skill_scores, seasons_played, teams_ids, depth_chart, position)
+                                   skill_scores, seasons_played, teams_ids, position)
             week += 1
     return params
 
 def update_params(params, row, week, season, player, dst_rank, dst_id, 
-                  skill_scores, seasons_played, teams_ids, depth_chart, position):
+                  skill_scores, seasons_played, teams_ids, position):
     params[2] += f'{week}, '
     params[1] += f'{season}, '
     fantasy_points = get_fantasy_points(row)
@@ -58,15 +57,14 @@ def update_params(params, row, week, season, player, dst_rank, dst_id,
     params[6] += f'{get_seasons_played(seasons_played, player, season)}, '
     params[7] += f'{player + 1}, '
     params[15] += f'{get_team_id(teams_ids, player, season)}, '
-    params[17] += f'{position}, '
+    params[16] += f'{position}, '
     
-    if fantasy_points == '-':
+    if fantasy_points == '-' or fantasy_points == '0.0':
         params = handle_missing_fantasy_points(params)
     else:
         params[0] += fantasy_points + ', '
         params[3] += dst_rank + ', '
         params[4] += dst_id + ', '
-        params[16] += f'{get_depth_chart(depth_chart, player, season, week)}, '
     return params
 
 def update_game_averages(params):
@@ -107,7 +105,7 @@ def get_depth_chart(depth_chart, player, season, week):
         return 0
 
 def handle_missing_fantasy_points(params):
-    for i in (0, 3, 4, 16):
+    for i in (0, 3, 4):
         params[i] += '0, '
     return params
 
@@ -125,9 +123,9 @@ def get_player_position(player_url):
         return 0.0
 
 def create_player_data(player_urls, dst_rankings, dst_ids, skill_scores, 
-                       seasons_played, teams_ids, depth_chart, num_params):
+                       seasons_played, teams_ids, num_params):
     
-    params, player_data = initialize_player_data(num_params, player_urls)
+    params, player_data = initialize_player_data(num_params)
     write_player_urls_to_file(player_urls)
     player = 0
     season = 1
@@ -136,7 +134,7 @@ def create_player_data(player_urls, dst_rankings, dst_ids, skill_scores,
         data = process_player_data(rows)
         params = process_player_season_data(data, player, season, params, dst_rankings, 
                                             dst_ids, skill_scores, seasons_played, 
-                                            teams_ids, depth_chart, get_player_position(player_url[0]))
+                                            teams_ids, get_player_position(player_url[0]))
         player_data = add_player_data(player_data, params)
         params = initialize_params(num_params)
         player += 1
