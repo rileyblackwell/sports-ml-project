@@ -119,11 +119,13 @@ def main():
       
         # outputs the team id for the last 3 seasons   
         if len(teams) >= 8:
-            team_id = ''.join(teams[-10:-4]) # teams played for 2020, 2021, 2022
+            team_id = ''.join(teams[-8:-2])
         elif len(teams) == 6:
-            team_id = ''.join(teams[-8:-4])
+            team_id = ''.join(teams[-6:-2])
         elif len(teams) == 4:
-            team_id = ''.join(teams[-6:-4])
+            team_id = ''.join(teams[-4:-2])
+        else:
+            team_id = ''
         
         write_player_team_id_to_db(player, team_id)
         parser.counter = 0 # resets the counter for the next player
@@ -146,11 +148,13 @@ def main():
       
         # outputs the team id for the last 3 seasons   
         if len(teams) >= 8:
-            team_id = ''.join(teams[-10:-4]) # teams played for 2020, 2021, 2022
+            team_id = ''.join(teams[-10:-4]) 
         elif len(teams) == 6:
             team_id = ''.join(teams[-8:-4])
         elif len(teams) == 4:
             team_id = ''.join(teams[-6:-4])
+        else:
+            team_id = ''
         
         write_player_team_id_to_db(player, team_id)
         parser.counter = 0 # resets the counter for the next player
@@ -173,11 +177,13 @@ def main():
       
         # outputs the team id for the last 3 seasons   
         if len(teams) >= 8:
-            team_id = ''.join(teams[-10:-4]) # teams played for 2020, 2021, 2022
+            team_id = ''.join(teams[-8:-2]) 
         elif len(teams) == 6:
-            team_id = ''.join(teams[-8:-4])
+            team_id = ''.join(teams[-6:-2])
         elif len(teams) == 4:
-            team_id = ''.join(teams[-6:-4])
+            team_id = ''.join(teams[-4:-2])
+        else:
+            team_id = ''
         
         write_player_team_id_to_db(player, team_id)
         parser.counter = 0 # resets the counter for the next player

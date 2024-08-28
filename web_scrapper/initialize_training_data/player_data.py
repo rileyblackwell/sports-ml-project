@@ -1,4 +1,4 @@
-from web_scrapper.initialize_training_data.create_params import create_game_average
+from web_scrapper.initialize_training_data.initialize_params import create_game_average
 
 from web_scrapper.initialize_training_data.database import (
     read_player_urls_from_db,
@@ -10,16 +10,17 @@ from web_scrapper.initialize_training_data.player_data_utils import (
     add_player_data,
     player_missed_season,
     process_player_data,
-    shuffle_player_urls,
 )
 
+def write_player_urls_to_file(player_urls):
+    with open('fantasy_football/players.txt', 'w') as f:
+        for player_url in player_urls:
+            f.write(player_url[0] + '\n')
 
-def initialize_player_data(num_params):
-    player_urls = read_player_urls_from_db()
-    player_urls = shuffle_player_urls(player_urls)
+def initialize_player_data(num_params, player_urls):
     params = initialize_params(num_params)
     player_data = []
-    return player_urls, params, player_data
+    return params, player_data
 
 def process_player_season_data(data, player, season, params, dst_rankings, dst_ids, 
                                skill_scores, seasons_played, teams_ids, depth_chart, position):
@@ -123,10 +124,11 @@ def get_player_position(player_url):
     else:
         return 0.0
 
-def create_player_data(dst_rankings, dst_ids, skill_scores, 
+def create_player_data(player_urls, dst_rankings, dst_ids, skill_scores, 
                        seasons_played, teams_ids, depth_chart, num_params):
     
-    player_urls, params, player_data = initialize_player_data(num_params)
+    params, player_data = initialize_player_data(num_params, player_urls)
+    write_player_urls_to_file(player_urls)
     player = 0
     season = 1
     for player_url in player_urls:

@@ -9,7 +9,7 @@ def fetch_player_skill_score(player):
         # Fetch the player skill score
         cursor.execute("""
             SELECT data 
-            FROM player_team_id
+            FROM player_skill_scores
             WHERE player_url LIKE ?
         """, (f"%{player}%",))
 
@@ -32,5 +32,5 @@ def fetch_player_skill_score(player):
             conn.close()
 
 if __name__ == '__main__':
-    player = "joe-burrow"
+    player = "rhamondre-stevenson"
     fetch_player_skill_score(player)

@@ -1,140 +1,100 @@
 import sqlite3
 
-def create_dst_rankings_dictionary():
-    """
-    Creates a dictionary of DST (Defense/Special Teams) rankings for each season and week.
 
-    Returns:
-        dict: A dictionary with keys as tuples (season, week, team_name) and values as rankings.
-    """
-    with open('web_scrapper/dst_id_and_rankings/dst_rankings.out') as f:
-        data = f.readlines()
-        data = [line.strip() for line in data]
-        data = [line.split(',') for line in data]
-
-    dst_rankings = {}
-    week, season = 1, 1
-    for line in data:
-        if line[0] == '':
-            week += 1
-        elif line[0] == 'end of season':
-            season += 1
-            week = 1
-        else:
-            dst_rankings[(season, week, line[1][1:])] = line[0]
-    return dst_rankings
-
-
-def create_dst_id_dictionary():
-    """
-    Creates a dictionary of DST (Defense/Special Teams) names their corresponding IDs.
-
-    Returns:
-        dict: A dictionary with keys as DST names and values as IDs.
-    """
-    with open('web_scrapper/dst_id_and_rankings/dst_id.out') as f:
-        data = f.readlines()
-        data = [line.strip() for line in data]
-        data = [line.split(',') for line in data]
-
-    dst_ids = {}
-    for line in data:
-        dst_ids[line[1][1:]] = line[0]
-    return dst_ids
-
-
-def create_team_ids(dst_ids):
+def create_team_ids(dst_ids, player_urls):
     """
     Creates a list of dictionaries containing team IDs for each season.
 
     Args:
         dst_ids (dict): Dictionary of DST IDs.
+        player_urls (list): List of player URLs.
 
     Returns:
         list: A list of dictionaries, each containing season-wise team IDs.
     """
     dst_ids['ALL'] = '33'  # ID if player played for multiple teams in a season
 
-    conn = sqlite3.connect("web_scrapper/player_stats.db")
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM player_team_id")
-    rows = cursor.fetchall()
-
-    data = []
-    for row in rows:
-        row_str = row[1].split('\n')
-        for row in row_str:
-            data.append(row.split(','))
-
-    # Replace empty spaces with empty strings in the data list
-    data = [[val if val != ' ' else '' for val in row] for row in data]
-    
-    conn.close()
-
     team_ids = []
-    for line in data:
-        i, j = 0, 1
-        teams = {}
-        while j < len(line):
-            season = -1
-            if line[i].strip() == '2021':
-                season = 1
-            elif line[i].strip() == '2022':
-                season = 2
-            elif line[i].strip() == '2023':
-                season = 3
+    for player_url in player_urls:
+        conn = sqlite3.connect("web_scrapper/player_stats.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT data FROM player_team_id WHERE player_url = ?", player_url)
+        result = cursor.fetchone()
+        conn.close()
 
-            if season != -1:
-                teams[season] = dst_ids[line[j].strip()]
-            i += 2
-            j += 2
-        team_ids.append(teams)
+        if result:
+            data = result[0].split('\n')
+            player_team_ids = {}
+            for line in data:
+                line = line.split(',')
+                for i in range(0, len(line), 2):
+                    season = get_season(line[i])
+                    if season:
+                        player_team_ids[season] = dst_ids[line[i + 1].strip()]
+            team_ids.append(player_team_ids)
+        else:
+            team_ids.append({})
+
     return team_ids
 
+def get_season(year):
+    """
+    Maps the year to the corresponding season.
 
-def create_skill_score():
+    Args:
+        year (str): The year.
+
+    Returns:
+        int: The season.
+    """
+    season_map = {'2021': 1, '2022': 2, '2023': 3}
+    return season_map.get(year.strip(), None)
+
+
+def create_skill_score(player_urls):
     """
     Creates a list of skill scores.
+
+    Args:
+        player_urls (list): List of player URLs.
 
     Returns:
         list: A list of skill scores.
     """
-    conn = sqlite3.connect("web_scrapper/player_stats.db")
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM player_skill_scores")
-    rows = cursor.fetchall()
-    conn.close()
-    
-    data = []
-    for row in rows:
-        row_str = row[1].split('\n')
-        for row in row_str:
-            data.append(row.split(','))
-
     skill_scores = []
-    skill_score, seasons = 0, 0
-    for line in data:
-        if line[0] == '':
+    for player_url in player_urls:
+        conn = sqlite3.connect("web_scrapper/player_stats.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT data FROM player_skill_scores WHERE player_url = ?", player_url)
+        result = cursor.fetchone()
+        conn.close()
+
+        if result:
+            data = result[0].split('\n')
+            player_skill_score = 0
+            seasons = 0
+            for line in data:
+                line = line.split(',')
+                if len(line) > 1:
+                    try:
+                        player_skill_score += float(line[1]) / float(line[0])
+                    except ValueError:
+                        player_skill_score += 0.0
+                    except ZeroDivisionError:
+                        if float(line[0]) != 0 and float(line[1]) != 0:  # Error occurs when dividing 0 points scored / 0 games played
+                            raise ZeroDivisionError
+                    seasons += 1
             try:
-                skill_scores.append(str(round(skill_score / seasons, 2)))
+                skill_scores.append(str(round(player_skill_score / seasons, 2)))
             except ZeroDivisionError:
                 skill_scores.append('0.0')
-            skill_score, seasons = 0, 0
         else:
-            try:
-                skill_score += float(line[1]) / float(line[0])
-            except ValueError:
-                skill_score += 0.0
-            except ZeroDivisionError:
-                if float(line[0]) != 0 and float(line[1]) != 0:  # Error occurs when dividing 0 points scored / 0 games played
-                    raise ZeroDivisionError
-            seasons += 1
+            skill_scores.append('0.0')
+
     return skill_scores
 
 
-def create_seasons_played():
+def create_seasons_played(player_urls):
     """
     Creates a list of number of seasons played for each player.
 
