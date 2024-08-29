@@ -1,4 +1,4 @@
-def create_data_csv(player_data, filename='fantasy_football/data.csv'):
+def create_data_csv(player_data, filename='../../fantasy_football/data.csv'):
     """
     Creates a text file with player data.
 

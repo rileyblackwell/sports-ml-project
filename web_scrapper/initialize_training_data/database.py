@@ -3,7 +3,7 @@ import sqlite3
 def read_player_urls_from_db():
     """Reads player urls from the database and returns it as a list of rows."""
     try:
-        conn = sqlite3.connect("web_scrapper/player_stats.db")
+        conn = sqlite3.connect("../player_stats.db")
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM player_urls")
         rows = cursor.fetchall()
@@ -16,7 +16,7 @@ def read_player_urls_from_db():
 def read_player_weekly_data_from_db(player_url):
     """Reads player weekly data from the database and returns it as a list of rows."""
     try:
-        conn = sqlite3.connect("web_scrapper/player_stats.db")
+        conn = sqlite3.connect("../player_stats.db")
         cursor = conn.cursor()
         cursor.execute(f"SELECT * FROM player_weekly_data WHERE player_url = '{player_url}'")
         rows = cursor.fetchall()
@@ -27,7 +27,7 @@ def read_player_weekly_data_from_db(player_url):
         return []   
     
 def read_player_position_from_db(player_url):
-    conn = sqlite3.connect("web_scrapper/player_stats.db")
+    conn = sqlite3.connect("../player_stats.db")
     cursor = conn.cursor()
 
     cursor.execute("SELECT data FROM player_positions WHERE player_url = ?", (player_url,))

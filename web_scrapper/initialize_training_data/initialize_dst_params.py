@@ -5,7 +5,7 @@ def initialize_dst_rankings_dictionary():
     Returns:
         dict: A dictionary with keys as tuples (season, week, team_name) and values as rankings.
     """
-    with open('web_scrapper/dst_id_and_rankings/dst_rankings.out') as f:
+    with open('../dst_id_and_rankings/dst_rankings.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]
@@ -30,7 +30,7 @@ def initialize_dst_id_dictionary():
     Returns:
         dict: A dictionary with keys as DST names and values as IDs.
     """
-    with open('web_scrapper/dst_id_and_rankings/dst_id.out') as f:
+    with open('../dst_id_and_rankings/dst_id.out') as f:
         data = f.readlines()
         data = [line.strip() for line in data]
         data = [line.split(',') for line in data]

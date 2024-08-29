@@ -1,10 +1,10 @@
-from web_scrapper.initialize_training_data.initialize_params import create_game_average
+from initialize_params import create_game_average
 
-from web_scrapper.initialize_training_data.database import (
+from database import (
     read_player_weekly_data_from_db,
     read_player_position_from_db,
 )
-from web_scrapper.initialize_training_data.player_data_utils import (
+from player_data_utils import (
     initialize_params,
     add_player_data,
     player_missed_season,
@@ -12,7 +12,7 @@ from web_scrapper.initialize_training_data.player_data_utils import (
 )
 
 def write_player_urls_to_file(player_urls):
-    with open('fantasy_football/players.txt', 'w') as f:
+    with open('../../fantasy_football/players.txt', 'w') as f:
         for player_url in player_urls:
             f.write(player_url[0] + '\n')
 

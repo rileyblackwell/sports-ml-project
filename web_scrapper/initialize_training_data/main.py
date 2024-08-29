@@ -1,13 +1,13 @@
-from web_scrapper.initialize_training_data.data_output import create_data_csv
-from web_scrapper.initialize_training_data.player_data import create_player_data
-from web_scrapper.initialize_training_data.database import read_player_urls_from_db
-from web_scrapper.initialize_training_data.player_data_utils import shuffle_player_urls
+from data_output import create_data_csv
+from player_data import create_player_data
+from database import read_player_urls_from_db
+from player_data_utils import shuffle_player_urls
 
-from web_scrapper.initialize_training_data.initialize_dst_params import (
+from initialize_dst_params import (
     initialize_dst_rankings_dictionary,
     initialize_dst_id_dictionary
 )
-from web_scrapper.initialize_training_data.initialize_params import (
+from initialize_params import (
     create_team_ids,
     create_depth_chart,
     create_fantasy_points,
@@ -18,8 +18,7 @@ from web_scrapper.initialize_training_data.initialize_params import (
 
 
 if __name__ == '__main__':
-    player_urls = read_player_urls_from_db()
-    # player_urls = [("travis-kelce",)]
+    player_urls = shuffle_player_urls(read_player_urls_from_db())
     dst_rankings = initialize_dst_rankings_dictionary()
     dst_ids = initialize_dst_id_dictionary()
     skill_scores = create_skill_score(player_urls)

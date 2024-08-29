@@ -16,7 +16,7 @@ def create_team_ids(dst_ids, player_urls):
 
     team_ids = []
     for player_url in player_urls:
-        conn = sqlite3.connect("web_scrapper/player_stats.db")
+        conn = sqlite3.connect("../player_stats.db")
         cursor = conn.cursor()
         cursor.execute("SELECT data FROM player_team_id WHERE player_url = ?", player_url)
         result = cursor.fetchone()
@@ -63,7 +63,7 @@ def create_skill_score(player_urls):
     """
     skill_scores = []
     for player_url in player_urls:
-        conn = sqlite3.connect("web_scrapper/player_stats.db")
+        conn = sqlite3.connect("../player_stats.db")
         cursor = conn.cursor()
         cursor.execute("SELECT data FROM player_skill_scores WHERE player_url = ?", player_url)
         result = cursor.fetchone()
@@ -106,7 +106,7 @@ def create_seasons_played(player_urls):
     """
     seasons_played = []
     for player_url in player_urls:
-        conn = sqlite3.connect("web_scrapper/player_stats.db")
+        conn = sqlite3.connect("../player_stats.db")
         cursor = conn.cursor()
 
         cursor.execute("SELECT data FROM player_rookie_season WHERE player_url = ?", player_url)
@@ -171,7 +171,7 @@ def create_fantasy_points():
     Returns:
         dict: A dictionary with keys as tuples (player_id, season) and values as fantasy points.
     """
-    conn = sqlite3.connect("web_scrapper/player_stats.db")
+    conn = sqlite3.connect("../player_stats.db")
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM player_weekly_data")
